@@ -2,9 +2,9 @@ from PIL import Image, ImageDraw, ImageFont
 import math
 
 FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
-SIZE = 40
+SIZE = 128
 TOTAL_FRAMES = 20
-TEXT = "重要"
+TEXT = "紧急"
 
 def make_frame(alpha: float) -> Image.Image:
     """alpha: 0.0 = 完全透明, 1.0 = 完全不透明"""
@@ -13,14 +13,14 @@ def make_frame(alpha: float) -> Image.Image:
 
     # 红色背景圆形
     bg_alpha = int(255 * alpha)
-    draw.ellipse([2, 2, SIZE - 2, SIZE - 2], fill=(220, 30, 30, bg_alpha))
+    draw.ellipse([4, 4, SIZE - 4, SIZE - 4], fill=(220, 30, 30, bg_alpha))
 
     # 白色描边
     stroke_alpha = int(200 * alpha)
-    draw.ellipse([2, 2, SIZE - 2, SIZE - 2], outline=(255, 255, 255, stroke_alpha), width=1)
+    draw.ellipse([4, 4, SIZE - 4, SIZE - 4], outline=(255, 255, 255, stroke_alpha), width=3)
 
     # "重要"文字
-    font_size = 14
+    font_size = 44
     font = ImageFont.truetype(FONT_PATH, font_size, index=0)
     text_alpha = int(255 * alpha)
 
