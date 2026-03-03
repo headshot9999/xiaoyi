@@ -1,19 +1,19 @@
 from PIL import Image, ImageDraw, ImageFont
 import math
 
-FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 SIZE = 128
 TOTAL_FRAMES = 20
-TEXT = "紧急"
+TEXT = "New"
 
 def make_frame(alpha: float) -> Image.Image:
     """alpha: 0.0 = 完全透明, 1.0 = 完全不透明"""
     img = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # 红色背景圆形
+    # 背景圆形 #00b5ef
     bg_alpha = int(255 * alpha)
-    draw.ellipse([4, 4, SIZE - 4, SIZE - 4], fill=(220, 30, 30, bg_alpha))
+    draw.ellipse([4, 4, SIZE - 4, SIZE - 4], fill=(0, 181, 239, bg_alpha))
 
     # 白色描边
     stroke_alpha = int(200 * alpha)
@@ -21,7 +21,7 @@ def make_frame(alpha: float) -> Image.Image:
 
     # "重要"文字
     font_size = 44
-    font = ImageFont.truetype(FONT_PATH, font_size, index=0)
+    font = ImageFont.truetype(FONT_PATH, font_size)
     text_alpha = int(255 * alpha)
 
     bbox = draw.textbbox((0, 0), TEXT, font=font)
