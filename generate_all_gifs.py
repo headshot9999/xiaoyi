@@ -125,6 +125,7 @@ def gen_important1_gif():
     W, H   = 216, 64
     BG     = (225, 80, 40)
     WHITE  = (255, 255, 255)
+    YELLOW = (255, 240, 0)
     font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
     frames = []
     for i in range(FRAMES):
@@ -135,8 +136,8 @@ def gen_important1_gif():
         # orange-red pill background
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
                                 fill=sc(BG, f) + (255,))
-        # bulb icon in white
-        draw_bulb(draw, 42, H // 2, 40, sc(WHITE, f) + (255,))
+        # bulb icon in vivid yellow
+        draw_bulb(draw, 42, H // 2, 40, sc(YELLOW, f) + (255,))
         # separator line
         draw.line([(70, 12), (70, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
         # text in bold white
