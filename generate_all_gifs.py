@@ -90,35 +90,66 @@ def gen_new_gif():
     save_gif(frames, "/workspace/icon1_new.gif")
 
 
-# ─── GIF 2: 紧急 (红色胶囊 + 粗体白字 + 大火焰图标) ──────────────────────────
+# ─── GIF 2: 紧急 (方波急促闪烁 + 橙色边框 + 超大黄色火焰) ──────────────────
 def gen_urgent_gif():
-    W, H  = 196, 64
-    RED  = (230, 45, 35)
-    CYAN = (0, 245, 255)   # 荧光青蓝，红色互补色
-    WHITE = (255, 255, 255)
-    font  = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
+    W, H    = 214, 68
+    RED_HI  = (255, 12, 12)   # 极亮红（亮态）
+    RED_LO  = (80,  4,  4)    # 极暗红（暗态）
+    YELLOW  = (255, 220, 0)   # 荧光黄火焰
+    ORANGE  = (255, 110, 0)   # 橙色边框
+    WHITE   = (255, 255, 255)
+    font    = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 30, index=0)
+
+    FAST = 14  # 更少帧 + 更短帧时 = 更急促
     frames = []
-    for i in range(FRAMES):
-        f    = blink(i)
+
+    for i in range(FAST):
+        t = i / FAST
+        # 方波闪烁：快速亮→暗切换，在暗态停留更短（制造紧张感）
+        if t < 0.38:
+            f = 1.0
+        elif t < 0.50:
+            f = max(0.0, 1.0 - (t - 0.38) / 0.12)
+        elif t < 0.72:
+            f = 0.0
+        else:
+            f = min(1.0, (t - 0.72) / 0.28)
+
         img  = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         r    = H // 2
-        # red pill background
+
+        # 背景在亮红与极暗红之间剧烈切换
+        bg = tuple(int(RED_LO[j] + (RED_HI[j] - RED_LO[j]) * f) for j in range(3))
+        draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r, fill=bg + (255,))
+
+        # 橙色脉冲边框（亮态加粗）
+        border_w = 3 if f > 0.5 else 1
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
-                                fill=sc(RED, f) + (255,))
-        # flame icon in vivid cyan (complement of red)
-        draw_flame(draw, 40, H // 2 + 1, 18, 26, sc(CYAN, f) + (255,))
-        # separator
-        draw.line([(66, 12), (66, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
-        # text in bold white
-        bbox = draw.textbbox((0, 0), "紧急", font=font)
+                                outline=tuple(int(c * max(0.2, f)) for c in ORANGE) + (255,),
+                                width=border_w)
+
+        # 超大黄色火焰
+        flame_col = tuple(int(c * max(0.15, f)) for c in YELLOW) + (255,)
+        draw_flame(draw, 43, H // 2 + 1, 22, 30, flame_col)
+
+        # 分割线
+        draw.line([(74, 12), (74, H - 12)],
+                  fill=(255, 255, 255, int(150 * f)), width=1)
+
+        # 粗体白色"紧急！"
+        bbox = draw.textbbox((0, 0), "紧急！", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
-        tx   = 72 + (W - 80 - tw) // 2 - bbox[0]
+        tx   = 80 + (W - 88 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "紧急", font=font, fill=sc(WHITE, f) + (255,))
+        draw.text((tx, ty), "紧急！", font=font,
+                  fill=tuple(int(c * max(0.2, f)) for c in WHITE) + (255,))
         frames.append(img)
-    save_gif(frames, "/workspace/icon2_urgent.gif")
+
+    frames[0].save("/workspace/icon2_urgent.gif", save_all=True,
+                   append_images=frames[1:], duration=[42] * FAST, loop=0, disposal=2)
+    print(f"已生成: /workspace/icon2_urgent.gif  ({W}x{H}px, {FAST}帧, 42ms/帧)")
 
 
 # ─── GIF 3: 重要 (浅粉胶囊 + 灯泡图标) ──────────────────────────────────────
