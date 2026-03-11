@@ -69,7 +69,7 @@ def gen_new_gif():
     W, H = 98, 56
     RED    = (228, 45, 35)
     YELLOW = (255, 218, 0)
-    font = ImageFont.truetype(EN_FONT, 24)
+    font = ImageFont.truetype(EN_FONT, 29)
     frames = []
     for i in range(FRAMES):
         f = blink(i)
@@ -98,7 +98,7 @@ def gen_urgent_gif():
     YELLOW  = (255, 220, 0)
     ORANGE  = (255, 110, 0)
     WHITE   = (255, 255, 255)
-    font    = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 14, index=0)
+    font    = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 17, index=0)
 
     FAST = 14
     frames = []
@@ -132,13 +132,14 @@ def gen_urgent_gif():
         draw.line([(36, 9), (36, H - 9)],
                   fill=(255, 255, 255, int(150 * f)), width=1)
 
-        bbox = draw.textbbox((0, 0), "紧急！", font=font)
+        text_col = tuple(int(c * max(0.2, f)) for c in WHITE) + (255,)
+        bbox = draw.textbbox((0, 0), "紧急！", font=font, stroke_width=1)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
         tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "紧急！", font=font,
-                  fill=tuple(int(c * max(0.2, f)) for c in WHITE) + (255,))
+        draw.text((tx, ty), "紧急！", font=font, fill=text_col,
+                  stroke_width=1, stroke_fill=text_col)
         frames.append(img)
 
     frames[0].save("/workspace/icon2_urgent.gif", save_all=True,
@@ -152,7 +153,7 @@ def gen_important1_gif():
     BG     = (225, 80, 40)
     WHITE  = (255, 255, 255)
     YELLOW = (255, 240, 0)
-    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 14, index=0)
+    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 19, index=0)
     frames = []
     for i in range(FRAMES):
         f    = blink(i)
@@ -163,12 +164,14 @@ def gen_important1_gif():
                                 fill=sc(BG, f) + (255,))
         draw_bulb(draw, 21, H // 2, 20, sc(YELLOW, f) + (255,))
         draw.line([(36, 9), (36, H - 9)], fill=(255, 255, 255, int(120 * f)), width=1)
-        bbox = draw.textbbox((0, 0), "重要", font=font)
+        text_col = sc(WHITE, f) + (255,)
+        bbox = draw.textbbox((0, 0), "重要", font=font, stroke_width=1)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
         tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "重要", font=font, fill=sc(WHITE, f) + (255,))
+        draw.text((tx, ty), "重要", font=font, fill=text_col,
+                  stroke_width=1, stroke_fill=text_col)
         frames.append(img)
     save_gif(frames, "/workspace/icon3_important1.gif")
 
