@@ -66,7 +66,7 @@ def draw_bulb(draw, cx, cy, size, fill):
 
 # ─── GIF 1: NEW! ────────────────────────────────────────────────────────────
 def gen_new_gif():
-    W, H = 98, 56
+    W, H = 98, 50
     RED    = (228, 45, 35)
     YELLOW = (255, 218, 0)
     font = ImageFont.truetype(EN_FONT, 29)
@@ -92,7 +92,7 @@ def gen_new_gif():
 
 # ─── GIF 2: 紧急 (方波急促闪烁 + 橙色边框 + 超大黄色火焰) ──────────────────
 def gen_urgent_gif():
-    W, H    = 98, 56
+    W, H    = 98, 50
     RED_HI  = (255, 12, 12)
     RED_LO  = (80,  4,  4)
     YELLOW  = (255, 220, 0)
@@ -148,7 +148,7 @@ def gen_urgent_gif():
 
 # ─── GIF 3: 重要 (浅粉胶囊 + 灯泡图标) ──────────────────────────────────────
 def gen_important1_gif():
-    W, H   = 98, 56
+    W, H   = 98, 50
     BG     = (225, 80, 40)
     WHITE  = (255, 255, 255)
     YELLOW = (255, 240, 0)
