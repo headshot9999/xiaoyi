@@ -133,13 +133,12 @@ def gen_urgent_gif():
                   fill=(255, 255, 255, int(150 * f)), width=1)
 
         text_col = tuple(int(c * max(0.2, f)) for c in WHITE) + (255,)
-        bbox = draw.textbbox((0, 0), "紧急！", font=font, stroke_width=1)
+        bbox = draw.textbbox((0, 0), "紧急！", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
         tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "紧急！", font=font, fill=text_col,
-                  stroke_width=1, stroke_fill=text_col)
+        draw.text((tx, ty), "紧急！", font=font, fill=text_col)
         frames.append(img)
 
     frames[0].save("/workspace/icon2_urgent.gif", save_all=True,
@@ -165,13 +164,12 @@ def gen_important1_gif():
         draw_bulb(draw, 21, H // 2, 20, sc(YELLOW, f) + (255,))
         draw.line([(36, 9), (36, H - 9)], fill=(255, 255, 255, int(120 * f)), width=1)
         text_col = sc(WHITE, f) + (255,)
-        bbox = draw.textbbox((0, 0), "重要", font=font, stroke_width=1)
+        bbox = draw.textbbox((0, 0), "重要", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
         tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "重要", font=font, fill=text_col,
-                  stroke_width=1, stroke_fill=text_col)
+        draw.text((tx, ty), "重要", font=font, fill=text_col)
         frames.append(img)
     save_gif(frames, "/workspace/icon3_important1.gif")
 
