@@ -93,9 +93,10 @@ def gen_new_gif():
 # ─── GIF 2: 紧急 (红色胶囊 + 粗体白字 + 大火焰图标) ──────────────────────────
 def gen_urgent_gif():
     W, H  = 196, 64
-    RED   = (230, 45, 35)
-    WHITE = (255, 255, 255)
-    font  = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
+    RED    = (230, 45, 35)
+    WHITE  = (255, 255, 255)
+    YELLOW = (255, 240, 0)
+    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
     frames = []
     for i in range(FRAMES):
         f    = blink(i)
@@ -105,8 +106,8 @@ def gen_urgent_gif():
         # red pill background
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
                                 fill=sc(RED, f) + (255,))
-        # flame icon (enlarged)
-        draw_flame(draw, 40, H // 2 + 1, 18, 26, sc(WHITE, f) + (255,))
+        # flame icon in vivid yellow
+        draw_flame(draw, 40, H // 2 + 1, 18, 26, sc(YELLOW, f) + (255,))
         # separator
         draw.line([(66, 12), (66, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
         # text in bold white
