@@ -123,28 +123,29 @@ def gen_urgent_gif():
 # ─── GIF 3: 重要 (浅粉胶囊 + 灯泡图标) ──────────────────────────────────────
 def gen_important1_gif():
     W, H   = 216, 64
-    CORAL  = (255, 95, 85)
-    BG     = (255, 236, 235)
-    font   = ImageFont.truetype(CJK_FONT, 28, index=0)
+    BG     = (225, 80, 40)
+    WHITE  = (255, 255, 255)
+    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
     frames = []
     for i in range(FRAMES):
-        f    = blink(i, lo=0.4)
+        f    = blink(i)
         img  = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         r    = H // 2
-        # pink pill background (brightness pulses slightly)
-        bg_f = 0.85 + 0.15 * f
+        # orange-red pill background
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
-                                fill=sc(BG, bg_f) + (255,))
-        # bulb icon
-        draw_bulb(draw, 42, H // 2, 40, sc(CORAL, f) + (255,))
-        # text
+                                fill=sc(BG, f) + (255,))
+        # bulb icon in white
+        draw_bulb(draw, 42, H // 2, 40, sc(WHITE, f) + (255,))
+        # separator line
+        draw.line([(70, 12), (70, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
+        # text in bold white
         bbox = draw.textbbox((0, 0), "重要", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
-        tx   = 72 + (W - 80 - tw) // 2 - bbox[0]
+        tx   = 76 + (W - 84 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "重要", font=font, fill=sc(CORAL, f) + (255,))
+        draw.text((tx, ty), "重要", font=font, fill=sc(WHITE, f) + (255,))
         frames.append(img)
     save_gif(frames, "/workspace/icon3_important1.gif")
 
