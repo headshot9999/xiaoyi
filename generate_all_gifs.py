@@ -66,25 +66,25 @@ def draw_bulb(draw, cx, cy, size, fill):
 
 # ─── GIF 1: NEW! ────────────────────────────────────────────────────────────
 def gen_new_gif():
-    W, H = 200, 76
+    W, H = 98, 56
     RED    = (228, 45, 35)
     YELLOW = (255, 218, 0)
-    font = ImageFont.truetype(EN_FONT, 50)
+    font = ImageFont.truetype(EN_FONT, 24)
     frames = []
     for i in range(FRAMES):
         f = blink(i)
         img  = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
-        skew = 13
-        bg_pts = [(skew, 0), (W - 4, 0), (W - 4 - skew, H - 1), (4, H - 1)]
+        skew = 6
+        bg_pts = [(skew, 0), (W - 3, 0), (W - 3 - skew, H - 1), (3, H - 1)]
         draw.polygon(bg_pts, fill=sc(RED, f) + (255,))
         # shadow
         bbox = draw.textbbox((0, 0), "NEW!", font=font)
         tw = bbox[2] - bbox[0]
         th = bbox[3] - bbox[1]
         x = (W - tw) // 2 - bbox[0]
-        y = (H - th) // 2 - bbox[1] - 2
-        draw.text((x + 2, y + 2), "NEW!", font=font, fill=(120, 20, 10, int(180 * f)))
+        y = (H - th) // 2 - bbox[1] - 1
+        draw.text((x + 1, y + 1), "NEW!", font=font, fill=(120, 20, 10, int(180 * f)))
         draw.text((x, y), "NEW!", font=font, fill=sc(YELLOW, f) + (255,))
         frames.append(img)
     save_gif(frames, "/workspace/icon1_new.gif")
@@ -92,20 +92,19 @@ def gen_new_gif():
 
 # ─── GIF 2: 紧急 (方波急促闪烁 + 橙色边框 + 超大黄色火焰) ──────────────────
 def gen_urgent_gif():
-    W, H    = 214, 68
-    RED_HI  = (255, 12, 12)   # 极亮红（亮态）
-    RED_LO  = (80,  4,  4)    # 极暗红（暗态）
-    YELLOW  = (255, 220, 0)   # 荧光黄火焰
-    ORANGE  = (255, 110, 0)   # 橙色边框
+    W, H    = 98, 56
+    RED_HI  = (255, 12, 12)
+    RED_LO  = (80,  4,  4)
+    YELLOW  = (255, 220, 0)
+    ORANGE  = (255, 110, 0)
     WHITE   = (255, 255, 255)
-    font    = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 30, index=0)
+    font    = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 14, index=0)
 
-    FAST = 14  # 更少帧 + 更短帧时 = 更急促
+    FAST = 14
     frames = []
 
     for i in range(FAST):
         t = i / FAST
-        # 方波闪烁：快速亮→暗切换，在暗态停留更短（制造紧张感）
         if t < 0.38:
             f = 1.0
         elif t < 0.50:
@@ -119,29 +118,24 @@ def gen_urgent_gif():
         draw = ImageDraw.Draw(img)
         r    = H // 2
 
-        # 背景在亮红与极暗红之间剧烈切换
         bg = tuple(int(RED_LO[j] + (RED_HI[j] - RED_LO[j]) * f) for j in range(3))
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r, fill=bg + (255,))
 
-        # 橙色脉冲边框（亮态加粗）
-        border_w = 3 if f > 0.5 else 1
+        border_w = 2 if f > 0.5 else 1
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
                                 outline=tuple(int(c * max(0.2, f)) for c in ORANGE) + (255,),
                                 width=border_w)
 
-        # 超大黄色火焰
         flame_col = tuple(int(c * max(0.15, f)) for c in YELLOW) + (255,)
-        draw_flame(draw, 43, H // 2 + 1, 22, 30, flame_col)
+        draw_flame(draw, 21, H // 2 + 1, 10, 15, flame_col)
 
-        # 分割线
-        draw.line([(74, 12), (74, H - 12)],
+        draw.line([(36, 9), (36, H - 9)],
                   fill=(255, 255, 255, int(150 * f)), width=1)
 
-        # 粗体白色"紧急！"
         bbox = draw.textbbox((0, 0), "紧急！", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
-        tx   = 80 + (W - 88 - tw) // 2 - bbox[0]
+        tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
         draw.text((tx, ty), "紧急！", font=font,
                   fill=tuple(int(c * max(0.2, f)) for c in WHITE) + (255,))
@@ -154,29 +148,25 @@ def gen_urgent_gif():
 
 # ─── GIF 3: 重要 (浅粉胶囊 + 灯泡图标) ──────────────────────────────────────
 def gen_important1_gif():
-    W, H   = 216, 64
+    W, H   = 98, 56
     BG     = (225, 80, 40)
     WHITE  = (255, 255, 255)
     YELLOW = (255, 240, 0)
-    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
+    font   = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 14, index=0)
     frames = []
     for i in range(FRAMES):
         f    = blink(i)
         img  = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         r    = H // 2
-        # orange-red pill background
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
                                 fill=sc(BG, f) + (255,))
-        # bulb icon in vivid yellow
-        draw_bulb(draw, 42, H // 2, 40, sc(YELLOW, f) + (255,))
-        # separator line
-        draw.line([(70, 12), (70, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
-        # text in bold white
+        draw_bulb(draw, 21, H // 2, 20, sc(YELLOW, f) + (255,))
+        draw.line([(36, 9), (36, H - 9)], fill=(255, 255, 255, int(120 * f)), width=1)
         bbox = draw.textbbox((0, 0), "重要", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
-        tx   = 76 + (W - 84 - tw) // 2 - bbox[0]
+        tx   = 40 + (W - 44 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
         draw.text((tx, ty), "重要", font=font, fill=sc(WHITE, f) + (255,))
         frames.append(img)
