@@ -90,35 +90,32 @@ def gen_new_gif():
     save_gif(frames, "/workspace/icon1_new.gif")
 
 
-# ─── GIF 2: 紧急 (白色胶囊 + 红边框 + 火焰图标) ─────────────────────────────
+# ─── GIF 2: 紧急 (红色胶囊 + 粗体白字 + 大火焰图标) ──────────────────────────
 def gen_urgent_gif():
-    W, H = 196, 64
-    RED   = (255, 75, 65)
+    W, H  = 196, 64
+    RED   = (230, 45, 35)
     WHITE = (255, 255, 255)
-    font  = ImageFont.truetype(CJK_FONT, 28, index=0)
+    font  = ImageFont.truetype("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc", 28, index=0)
     frames = []
     for i in range(FRAMES):
         f    = blink(i)
         img  = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         r    = H // 2
-        # white pill background
+        # red pill background
         draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
-                                fill=(255, 255, 255, 255))
-        # red border
-        draw.rounded_rectangle([2, 2, W - 2, H - 2], radius=r,
-                                outline=sc(RED, f) + (255,), width=2)
-        # flame icon
-        draw_flame(draw, 38, H // 2 + 1, 13, 19, sc(RED, f) + (255,))
+                                fill=sc(RED, f) + (255,))
+        # flame icon (enlarged)
+        draw_flame(draw, 40, H // 2 + 1, 18, 26, sc(WHITE, f) + (255,))
         # separator
-        draw.line([(60, 12), (60, H - 12)], fill=sc(RED, f) + (150,), width=1)
-        # text
+        draw.line([(66, 12), (66, H - 12)], fill=(255, 255, 255, int(120 * f)), width=1)
+        # text in bold white
         bbox = draw.textbbox((0, 0), "紧急", font=font)
         tw   = bbox[2] - bbox[0]
         th   = bbox[3] - bbox[1]
-        tx   = 66 + (W - 74 - tw) // 2 - bbox[0]
+        tx   = 72 + (W - 80 - tw) // 2 - bbox[0]
         ty   = (H - th) // 2 - bbox[1]
-        draw.text((tx, ty), "紧急", font=font, fill=sc(RED, f) + (255,))
+        draw.text((tx, ty), "紧急", font=font, fill=sc(WHITE, f) + (255,))
         frames.append(img)
     save_gif(frames, "/workspace/icon2_urgent.gif")
 
