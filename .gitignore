@@ -1,0 +1,12 @@
+# 生成的 Word 文档
+*.docx
+
+# 放入 photos/ 的个人照片（保留目录与说明文件）
+photos/*
+!photos/把照片放这里.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
