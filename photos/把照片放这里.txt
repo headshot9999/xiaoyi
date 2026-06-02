@@ -1,0 +1,2 @@
+把你要打印的照片（jpg/png）放到这个文件夹里，然后在仓库根目录运行：
+  python make_photo_doc.py -i photos -o 证件照.docx
