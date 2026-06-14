@@ -83,12 +83,6 @@ input, select, button { font-family: inherit; }
   padding: 6px 16px 56px;
 }
 .hero__row { display: flex; align-items: center; gap: 12px; }
-.hero__avatar {
-  width: 46px; height: 46px; border-radius: 50%;
-  background: #fff; color: var(--atomy-dark);
-  display: grid; place-items: center; font-size: 20px; font-weight: 800;
-  flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,.12);
-}
 .hero__who { flex: 1; min-width: 0; }
 .hero__name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .hero__tag { font-size: 10px; font-weight: 700; background: var(--gold); color: #5a3b00; padding: 2px 7px; border-radius: 999px; }
@@ -143,25 +137,42 @@ input, select, button { font-family: inherit; }
   border: 1.5px solid #fff;
 }
 
-/* ===== Month chips ===== */
-.chips {
-  display: flex; gap: 8px;
-  overflow-x: auto;
-  padding: 14px 2px 4px;
-  scrollbar-width: none;
-}
-.chips::-webkit-scrollbar { display: none; }
-.chip {
-  flex: 0 0 auto;
-  border: 1px solid var(--line);
+/* ===== Month filter（日期控件） ===== */
+.month-filter {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 14px;
   background: var(--card);
-  color: var(--ink-2);
-  font-size: 13px; font-weight: 600;
-  padding: 7px 14px; border-radius: 999px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-card);
+}
+.month-filter__label { font-size: 13px; font-weight: 700; color: var(--ink-2); flex-shrink: 0; }
+.month-filter__controls { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+.month-picker {
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 0 10px; height: 38px;
+  background: #fff; cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.month-picker:focus-within { border-color: var(--atomy); box-shadow: 0 0 0 3px var(--atomy-soft); }
+.month-picker.is-disabled { opacity: .45; }
+.month-picker__icon { font-size: 14px; }
+.month-picker input[type="month"] {
+  border: none; outline: none; background: transparent;
+  font-size: 14px; color: var(--ink); font-family: inherit;
+  height: 36px; min-width: 120px;
+}
+.month-all {
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  background: #fff; color: var(--ink-2);
+  font-size: 13px; font-weight: 700;
+  height: 38px; padding: 0 14px; border-radius: 10px;
   cursor: pointer; white-space: nowrap;
   transition: all .15s ease;
 }
-.chip--active {
+.month-all.is-active {
   background: var(--atomy); color: #fff; border-color: var(--atomy);
   box-shadow: 0 4px 12px rgba(0,181,239,.32);
 }
@@ -232,14 +243,10 @@ input, select, button { font-family: inherit; }
 .mcard__id { flex: 1; min-width: 0; }
 .mcard__id-num { font-size: 15px; font-weight: 800; }
 .mcard__nick { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
-.mcard__chev { color: var(--ink-3); font-size: 20px; flex-shrink: 0; line-height: 1; }
-
-.mcard__bind {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--ink-2);
-  margin: 10px 0 0; padding-left: 38px;
-}
-.mcard__bind .k { color: var(--ink-3); }
+.mcard__when { text-align: right; flex-shrink: 0; }
+.mcard__when-label { display: block; font-size: 11px; color: var(--ink-3); }
+.mcard__when-time { display: block; font-size: 12px; color: var(--ink-2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.mcard__chev { color: var(--ink-3); font-size: 20px; flex-shrink: 0; line-height: 1; margin-left: 2px; }
 
 .mcard__pts {
   display: flex; gap: 10px;

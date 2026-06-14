@@ -41,7 +41,9 @@
   const $ = (id) => document.getElementById(id);
   const els = {
     memberInput: $('memberInput'),
-    monthChips: $('monthChips'),
+    monthPicker: $('monthPicker'),
+    monthPickerWrap: $('monthPickerWrap'),
+    monthAllBtn: $('monthAllBtn'),
     filterToggle: $('filterToggle'),
     filterDot: $('filterDot'),
     advPanel: $('advPanel'),
@@ -87,24 +89,38 @@
 
   function fmtNum(n) { return n.toLocaleString('zh-CN'); }
 
-  // ---- 月份 chips ----
-  function initMonthChips() {
-    const items = [{ v: 'all', label: '全部累计' }]
-      .concat(MONTHS.map((m) => ({ v: m, label: m.slice(5) + ' 月' })));
-    els.monthChips.innerHTML = items.map((it) =>
-      `<button class="chip ${it.v === state.month ? 'chip--active' : ''}" data-month="${it.v}">${it.label}</button>`
-    ).join('');
-    els.monthChips.querySelectorAll('.chip').forEach((c) => {
-      c.addEventListener('click', () => {
-        state.month = c.dataset.month;
-        state.visible = PAGE_SIZE;
-        els.monthChips.querySelectorAll('.chip').forEach((x) => x.classList.remove('chip--active'));
-        c.classList.add('chip--active');
-        render();
-      });
+  // ---- 月份筛选（日期控件 + 全部累计） ----
+  function syncMonthControl() {
+    const isAll = state.month === 'all';
+    els.monthAllBtn.classList.toggle('is-active', isAll);
+    els.monthPickerWrap.classList.toggle('is-disabled', isAll);
+    if (!isAll) els.monthPicker.value = state.month;
+  }
+  function initMonthControl() {
+    els.monthPicker.addEventListener('change', () => {
+      const v = els.monthPicker.value;
+      if (!v) return;
+      state.month = v;
+      state.visible = PAGE_SIZE;
+      syncMonthControl();
+      render();
     });
-    const active = els.monthChips.querySelector('.chip--active');
-    if (active) els.monthChips.scrollLeft = active.offsetLeft - 12;
+    // 点击日期框区域时，自动从「全部累计」切回具体月份
+    els.monthPickerWrap.addEventListener('click', () => {
+      if (state.month === 'all') {
+        state.month = els.monthPicker.value || CURRENT_MONTH;
+        state.visible = PAGE_SIZE;
+        syncMonthControl();
+        render();
+      }
+    });
+    els.monthAllBtn.addEventListener('click', () => {
+      state.month = 'all';
+      state.visible = PAGE_SIZE;
+      syncMonthControl();
+      render();
+    });
+    syncMonthControl();
   }
 
   function getFiltered() {
@@ -170,9 +186,12 @@
               <div class="mcard__id-num">${r.id}</div>
               <div class="mcard__nick">${r.nick}</div>
             </div>
+            <div class="mcard__when">
+              <span class="mcard__when-label">绑定时间</span>
+              <span class="mcard__when-time">${r.bindTime}</span>
+            </div>
             <span class="mcard__chev">›</span>
           </div>
-          <div class="mcard__bind"><span class="k">绑定时间</span> ${r.bindTime}</div>
           <div class="mcard__pts">
             <div class="pt-box">
               <div class="pt-box__label">${monthLabel()}</div>
@@ -296,8 +315,7 @@
     els.bindStart.value = '';
     els.bindEnd.value = '';
     els.sortSelect.value = 'month-desc';
-    els.monthChips.querySelectorAll('.chip').forEach((c) =>
-      c.classList.toggle('chip--active', c.dataset.month === 'all'));
+    syncMonthControl();
     els.advPanel.hidden = true;
     render();
   }
@@ -317,6 +335,6 @@
   els.bindClose.addEventListener('click', closeSheets);
   els.backdrop.addEventListener('click', closeSheets);
 
-  initMonthChips();
+  initMonthControl();
   render();
 })();

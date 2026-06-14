@@ -19,7 +19,6 @@
     <!-- 蓝色头部区 -->
     <div class="hero">
       <div class="hero__row">
-        <div class="hero__avatar">达</div>
         <div class="hero__who">
           <div class="hero__name">王晓艺 <span class="hero__tag">服务达人</span></div>
           <div class="hero__meta">工号 SV-100238</div>
@@ -58,8 +57,17 @@
         </button>
       </div>
 
-      <!-- 月份 chips -->
-      <div class="chips" id="monthChips"></div>
+      <!-- 月份筛选（日期控件） -->
+      <div class="month-filter">
+        <span class="month-filter__label">积分月份</span>
+        <div class="month-filter__controls">
+          <label class="month-picker" id="monthPickerWrap">
+            <span class="month-picker__icon">📅</span>
+            <input type="month" id="monthPicker" min="2026-01" max="2026-06" value="2026-06" />
+          </label>
+          <button class="month-all" id="monthAllBtn" type="button">全部累计</button>
+        </div>
+      </div>
 
       <!-- 高级筛选面板 -->
       <div class="adv" id="advPanel" hidden>
