@@ -22,7 +22,7 @@
         <div class="hero__avatar">达</div>
         <div class="hero__who">
           <div class="hero__name">王晓艺 <span class="hero__tag">服务达人</span></div>
-          <div class="hero__meta">工号 SV-100238 · 华东大区</div>
+          <div class="hero__meta">工号 SV-100238</div>
         </div>
         <div class="hero__rank">
           <span class="hero__rank-num">第 6 名</span>
@@ -42,10 +42,6 @@
         <div class="mini-stat">
           <span class="mini-stat__value" id="statTotalPoints">0</span>
           <span class="mini-stat__label">累计积分</span>
-        </div>
-        <div class="mini-stat">
-          <span class="mini-stat__value" id="statActive">0</span>
-          <span class="mini-stat__label">本月活跃</span>
         </div>
       </div>
     </div>
@@ -95,7 +91,6 @@
       <!-- 列表头 -->
       <div class="list-head">
         <span class="list-head__title" id="listTitle">绑定会员明细</span>
-        <button class="link-btn" id="exportBtn">导出</button>
       </div>
 
       <!-- 卡片列表 -->
@@ -113,6 +108,62 @@
 
       <p class="content__foot">数据每日 00:00 更新 · 本页面为 UI 演示，数据为模拟生成</p>
     </main>
+
+    <!-- 悬浮「绑定会员」按钮 -->
+    <button class="fab" id="bindFab">
+      <span class="fab__plus">＋</span> 绑定会员
+    </button>
+
+    <!-- 遮罩 -->
+    <div class="backdrop" id="backdrop" hidden></div>
+
+    <!-- 会员积分贡献明细弹层 -->
+    <section class="sheet" id="detailSheet" hidden aria-hidden="true">
+      <div class="sheet__handle"></div>
+      <div class="sheet__head">
+        <div>
+          <div class="sheet__title" id="detailId">会员号</div>
+          <div class="sheet__sub" id="detailNick">昵称</div>
+        </div>
+        <button class="sheet__close" id="detailClose" aria-label="关闭">×</button>
+      </div>
+
+      <div class="detail-summary">
+        <div class="detail-summary__item">
+          <span class="detail-summary__label">绑定时间</span>
+          <span class="detail-summary__value" id="detailBind">—</span>
+        </div>
+        <div class="detail-summary__item">
+          <span class="detail-summary__label">累计贡献积分</span>
+          <span class="detail-summary__value detail-summary__value--hl" id="detailTotal">0</span>
+        </div>
+      </div>
+
+      <div class="detail-section-title">按月积分贡献</div>
+      <ul class="detail-months" id="detailMonths"></ul>
+    </section>
+
+    <!-- 绑定会员弹层 -->
+    <section class="sheet" id="bindSheet" hidden aria-hidden="true">
+      <div class="sheet__handle"></div>
+      <div class="sheet__head">
+        <div class="sheet__title">绑定新会员</div>
+        <button class="sheet__close" id="bindClose" aria-label="关闭">×</button>
+      </div>
+
+      <div class="bind-form">
+        <div class="adv__field">
+          <label for="bindMemberId">会员号</label>
+          <input type="text" id="bindMemberId" placeholder="请输入会员号，如 M20261099" autocomplete="off" />
+        </div>
+        <div class="adv__field">
+          <label for="bindMemberNick">会员昵称（选填）</label>
+          <input type="text" id="bindMemberNick" placeholder="请输入会员昵称" autocomplete="off" />
+        </div>
+        <p class="bind-form__tip" id="bindTip" hidden></p>
+        <button class="btn btn--primary btn--block" id="bindConfirm">确认绑定</button>
+      </div>
+    </section>
   </div>
 
   <script src="app.js"></script>

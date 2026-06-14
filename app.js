@@ -36,7 +36,7 @@
     return list;
   }
 
-  const ALL_MEMBERS = generateMembers(46);
+  const MEMBERS = generateMembers(46);
 
   const $ = (id) => document.getElementById(id);
   const els = {
@@ -54,12 +54,26 @@
     emptyState: $('emptyState'),
     emptyResetBtn: $('emptyResetBtn'),
     loadMoreBtn: $('loadMoreBtn'),
-    exportBtn: $('exportBtn'),
     listTitle: $('listTitle'),
     statMembers: $('statMembers'),
     statMonthPoints: $('statMonthPoints'),
     statTotalPoints: $('statTotalPoints'),
-    statActive: $('statActive'),
+    // 悬浮按钮 & 弹层
+    bindFab: $('bindFab'),
+    backdrop: $('backdrop'),
+    detailSheet: $('detailSheet'),
+    detailClose: $('detailClose'),
+    detailId: $('detailId'),
+    detailNick: $('detailNick'),
+    detailBind: $('detailBind'),
+    detailTotal: $('detailTotal'),
+    detailMonths: $('detailMonths'),
+    bindSheet: $('bindSheet'),
+    bindClose: $('bindClose'),
+    bindMemberId: $('bindMemberId'),
+    bindMemberNick: $('bindMemberNick'),
+    bindTip: $('bindTip'),
+    bindConfirm: $('bindConfirm'),
   };
 
   const state = {
@@ -89,13 +103,12 @@
         render();
       });
     });
-    // 让默认选中的月份滚动到可见位置（仅水平滚动，不影响页面）
     const active = els.monthChips.querySelector('.chip--active');
     if (active) els.monthChips.scrollLeft = active.offsetLeft - 12;
   }
 
   function getFiltered() {
-    let rows = ALL_MEMBERS.slice();
+    let rows = MEMBERS.slice();
     if (state.member.trim()) {
       const kw = state.member.trim().toLowerCase();
       rows = rows.filter((r) => r.id.toLowerCase().includes(kw) || r.nick.toLowerCase().includes(kw));
@@ -116,14 +129,12 @@
     return rows;
   }
 
-  function renderStats(rows) {
-    const monthPoints = rows.reduce((s, r) => s + (r.points[CURRENT_MONTH] || 0), 0);
-    const totalPoints = rows.reduce((s, r) => s + r.total, 0);
-    const activeCount = rows.filter((r) => (r.points[CURRENT_MONTH] || 0) > 0).length;
-    els.statMembers.textContent = fmtNum(rows.length);
+  function renderStats() {
+    const monthPoints = MEMBERS.reduce((s, r) => s + (r.points[CURRENT_MONTH] || 0), 0);
+    const totalPoints = MEMBERS.reduce((s, r) => s + r.total, 0);
+    els.statMembers.textContent = fmtNum(MEMBERS.length);
     els.statMonthPoints.textContent = fmtNum(monthPoints);
     els.statTotalPoints.textContent = fmtNum(totalPoints);
-    els.statActive.textContent = fmtNum(activeCount);
   }
 
   function monthLabel() {
@@ -132,7 +143,7 @@
 
   function render() {
     const rows = getFiltered();
-    renderStats(rows);
+    renderStats();
 
     els.listTitle.textContent = `绑定会员明细 · 共 ${fmtNum(rows.length)} 人`;
     els.filterDot.hidden = !(state.bindStart || state.bindEnd || state.sort !== 'month-desc');
@@ -150,17 +161,16 @@
       const rankNum = i + 1;
       const rankCls = rankNum <= 3 ? `rank-badge rank-badge--${rankNum}` : 'rank-badge';
       const monthPts = state.month === 'all' ? r.total : (r.points[state.month] || 0);
-      const isActive = (r.points[CURRENT_MONTH] || 0) > 0;
       const hotCls = monthPts >= 400 ? ' hot' : '';
       return `
-        <li class="mcard">
+        <li class="mcard" data-id="${r.id}">
           <div class="mcard__top">
             <span class="${rankCls}">${rankNum}</span>
             <div class="mcard__id">
               <div class="mcard__id-num">${r.id}</div>
               <div class="mcard__nick">${r.nick}</div>
             </div>
-            <span class="tag ${isActive ? 'tag--active' : 'tag--sleep'}">${isActive ? '本月活跃' : '本月沉睡'}</span>
+            <span class="mcard__chev">›</span>
           </div>
           <div class="mcard__bind"><span class="k">绑定时间</span> ${r.bindTime}</div>
           <div class="mcard__pts">
@@ -176,8 +186,93 @@
         </li>`;
     }).join('');
 
+    els.cardList.querySelectorAll('.mcard').forEach((card) => {
+      card.addEventListener('click', () => openDetail(card.dataset.id));
+    });
+
     els.loadMoreBtn.hidden = state.visible >= rows.length;
     els.loadMoreBtn.textContent = `加载更多（剩余 ${fmtNum(Math.max(0, rows.length - state.visible))} 人）`;
+  }
+
+  // ---- 弹层通用 ----
+  function openSheet(sheet) {
+    els.backdrop.hidden = false;
+    sheet.hidden = false;
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheets() {
+    els.backdrop.hidden = true;
+    [els.detailSheet, els.bindSheet].forEach((s) => { s.hidden = true; s.setAttribute('aria-hidden', 'true'); });
+    document.body.style.overflow = '';
+  }
+
+  // ---- 会员积分贡献明细 ----
+  function openDetail(id) {
+    const m = MEMBERS.find((x) => x.id === id);
+    if (!m) return;
+    els.detailId.textContent = m.id;
+    els.detailNick.textContent = m.nick;
+    els.detailBind.textContent = m.bindTime;
+    els.detailTotal.textContent = fmtNum(m.total);
+
+    const maxPts = Math.max(1, ...MONTHS.map((mo) => m.points[mo] || 0));
+    els.detailMonths.innerHTML = MONTHS.slice().reverse().map((mo) => {
+      const pts = m.points[mo] || 0;
+      const pct = Math.round((pts / maxPts) * 100);
+      return `
+        <li class="dm-row">
+          <div class="dm-row__top">
+            <span class="dm-row__month">${mo.replace('-', ' 年 ')} 月</span>
+            <span class="dm-row__pts ${pts === 0 ? 'dm-row__pts--zero' : ''}">${pts > 0 ? '+' + fmtNum(pts) : '— 未贡献'}</span>
+          </div>
+          <div class="dm-bar"><div class="dm-bar__fill" style="width:${pct}%"></div></div>
+        </li>`;
+    }).join('');
+
+    openSheet(els.detailSheet);
+  }
+
+  // ---- 绑定新会员 ----
+  function openBind() {
+    els.bindMemberId.value = '';
+    els.bindMemberNick.value = '';
+    els.bindTip.hidden = true;
+    els.bindTip.className = 'bind-form__tip';
+    openSheet(els.bindSheet);
+    setTimeout(() => els.bindMemberId.focus(), 200);
+  }
+
+  function showTip(msg, type) {
+    els.bindTip.textContent = msg;
+    els.bindTip.className = 'bind-form__tip ' + type;
+    els.bindTip.hidden = false;
+  }
+
+  function confirmBind() {
+    const id = els.bindMemberId.value.trim();
+    if (!id) { showTip('请输入会员号', 'err'); return; }
+    if (MEMBERS.some((m) => m.id.toLowerCase() === id.toLowerCase())) {
+      showTip('该会员号已绑定，请勿重复绑定', 'err');
+      return;
+    }
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const bindTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const points = {};
+    MONTHS.forEach((mo) => { points[mo] = 0; });
+    MEMBERS.unshift({
+      id,
+      nick: els.bindMemberNick.value.trim() || '新会员',
+      bindTime,
+      bindDate: bindTime.slice(0, 10),
+      points,
+      total: 0,
+    });
+    showTip('绑定成功！', 'ok');
+    state.visible = PAGE_SIZE;
+    render();
+    setTimeout(closeSheets, 800);
   }
 
   function applyAdv() {
@@ -207,31 +302,20 @@
     render();
   }
 
-  function exportCsv() {
-    const rows = getFiltered();
-    const header = ['会员号', '会员昵称', '绑定时间', monthLabel(), '累计贡献积分'];
-    const lines = [header.join(',')];
-    rows.forEach((r) => {
-      const monthPts = state.month === 'all' ? r.total : (r.points[state.month] || 0);
-      lines.push([r.id, r.nick, r.bindTime, monthPts, r.total].join(','));
-    });
-    const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `服务达人_绑定会员明细_${state.month}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
+  // ---- 事件绑定 ----
   els.filterToggle.addEventListener('click', () => { els.advPanel.hidden = !els.advPanel.hidden; });
   els.applyBtn.addEventListener('click', applyAdv);
   els.resetBtn.addEventListener('click', resetFilters);
   els.emptyResetBtn.addEventListener('click', resetFilters);
-  els.exportBtn.addEventListener('click', exportCsv);
   els.loadMoreBtn.addEventListener('click', () => { state.visible += PAGE_SIZE; render(); });
   els.memberInput.addEventListener('input', () => { state.member = els.memberInput.value; state.visible = PAGE_SIZE; render(); });
   els.memberInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') els.memberInput.blur(); });
+
+  els.bindFab.addEventListener('click', openBind);
+  els.bindConfirm.addEventListener('click', confirmBind);
+  els.detailClose.addEventListener('click', closeSheets);
+  els.bindClose.addEventListener('click', closeSheets);
+  els.backdrop.addEventListener('click', closeSheets);
 
   initMonthChips();
   render();
