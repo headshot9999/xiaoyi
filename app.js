@@ -17,20 +17,6 @@
   function randInt(min, max) { return Math.floor(rand() * (max - min + 1)) + min; }
   function pick(arr) { return arr[Math.floor(rand() * arr.length)]; }
 
-  // 将某月总积分拆分为 k 笔订单（每笔 >= 1，且之和等于总积分）
-  function splitPoints(total, k) {
-    k = Math.max(1, Math.min(k, total));
-    const parts = new Array(k).fill(1);
-    let rem = total - k;
-    while (rem > 0) {
-      const i = Math.floor(rand() * k);
-      const add = Math.min(rem, randInt(1, Math.max(1, Math.ceil(rem / 2))));
-      parts[i] += add;
-      rem -= add;
-    }
-    return parts;
-  }
-
   function generateMembers(count) {
     const list = [];
     for (let i = 0; i < count; i++) {
@@ -41,22 +27,20 @@
       const bindTime = `${bindDate} ${String(randInt(8, 22)).padStart(2, '0')}:${String(randInt(0, 59)).padStart(2, '0')}`;
       const points = {};
       const orders = [];
+      // 每月仅一笔订单计入挑战赛积分
       MONTHS.forEach((m, idx) => {
         if (idx < bindMonthIdx) { points[m] = 0; return; }
         const p = rand() < 0.3 ? 0 : randInt(20, 680);
         points[m] = p;
         if (p > 0) {
-          const parts = splitPoints(p, randInt(1, 4));
-          parts.forEach((pts) => {
-            const day = randInt(1, 28);
-            const hh = String(randInt(8, 22)).padStart(2, '0');
-            const mm = String(randInt(0, 59)).padStart(2, '0');
-            orders.push({
-              no: 'AO' + m.replace('-', '') + String(randInt(10000, 99999)),
-              datetime: `${m}-${String(day).padStart(2, '0')} ${hh}:${mm}`,
-              month: m,
-              points: pts,
-            });
+          const day = randInt(1, 28);
+          const hh = String(randInt(8, 22)).padStart(2, '0');
+          const mm = String(randInt(0, 59)).padStart(2, '0');
+          orders.push({
+            no: 'AO' + m.replace('-', '') + String(randInt(10000, 99999)),
+            datetime: `${m}-${String(day).padStart(2, '0')} ${hh}:${mm}`,
+            month: m,
+            points: p,
           });
         }
       });
@@ -284,31 +268,35 @@
     els.detailBind.textContent = m.bindTime;
     els.detailTotal.textContent = fmtNum(m.total);
 
-    const monthsWithOrders = MONTHS.slice().reverse()
-      .filter((mo) => m.orders.some((o) => o.month === mo));
+    // 仅展示绑定当月及之后的月份；每月最多一笔计分订单
+    const bindMonth = m.bindDate.slice(0, 7);
+    const months = MONTHS.slice().reverse().filter((mo) => mo >= bindMonth);
 
-    if (monthsWithOrders.length === 0) {
-      els.detailMonths.innerHTML = '<li class="detail-empty">该会员暂无积分贡献订单</li>';
+    if (months.length === 0) {
+      els.detailMonths.innerHTML = '<li class="detail-empty">该会员暂无计分订单</li>';
     } else {
-      els.detailMonths.innerHTML = monthsWithOrders.map((mo) => {
-        const list = m.orders.filter((o) => o.month === mo)
-          .sort((a, b) => b.datetime.localeCompare(a.datetime));
-        const sum = list.reduce((s, o) => s + o.points, 0);
-        const rows = list.map((o) => `
-          <li class="order-item">
-            <div class="order-item__main">
-              <span class="order-item__no">订单号 ${o.no}</span>
-              <span class="order-item__time">${o.datetime}</span>
-            </div>
-            <span class="order-item__pts">+${fmtNum(o.points)}</span>
-          </li>`).join('');
+      els.detailMonths.innerHTML = months.map((mo) => {
+        const order = m.orders.find((o) => o.month === mo);
+        if (order) {
+          return `
+            <li class="dm-item">
+              <div class="dm-item__head">
+                <span class="dm-item__month">${mo.replace('-', ' 年 ')} 月</span>
+                <span class="dm-item__pts">+${fmtNum(order.points)}</span>
+              </div>
+              <div class="dm-item__order">
+                <span class="dm-item__no">计分订单 ${order.no}</span>
+                <span class="dm-item__time">${order.datetime}</span>
+              </div>
+            </li>`;
+        }
         return `
-          <li class="dm-group">
-            <div class="dm-group__head">
-              <span class="dm-group__month">${mo.replace('-', ' 年 ')} 月</span>
-              <span class="dm-group__sum">合计 +${fmtNum(sum)}（${list.length} 笔）</span>
+          <li class="dm-item dm-item--empty">
+            <div class="dm-item__head">
+              <span class="dm-item__month">${mo.replace('-', ' 年 ')} 月</span>
+              <span class="dm-item__pts dm-item__pts--zero">未计分</span>
             </div>
-            <ul class="order-list">${rows}</ul>
+            <div class="dm-item__order">本月暂无计分订单</div>
           </li>`;
       }).join('');
     }
