@@ -172,16 +172,36 @@
     }
     els.emptyState.hidden = true;
 
+    // 基于全部绑定会员计算「当月排名」与「总排名」（不受搜索/分页影响）
+    const monthValOf = (r) => (state.month === 'all' ? r.total : (r.points[state.month] || 0));
+    const totalRank = new Map();
+    MEMBERS.slice().sort((a, b) => b.total - a.total).forEach((m, i) => totalRank.set(m.id, i + 1));
+    const monthRank = new Map();
+    MEMBERS.slice().sort((a, b) => monthValOf(b) - monthValOf(a)).forEach((m, i) => monthRank.set(m.id, i + 1));
+    const isAll = state.month === 'all';
+
     const shown = rows.slice(0, state.visible);
-    els.cardList.innerHTML = shown.map((r, i) => {
-      const rankNum = i + 1;
-      const rankCls = rankNum <= 3 ? `rank-badge rank-badge--${rankNum}` : 'rank-badge';
-      const monthPts = state.month === 'all' ? r.total : (r.points[state.month] || 0);
+    els.cardList.innerHTML = shown.map((r) => {
+      const tRank = totalRank.get(r.id);
+      const mRank = monthRank.get(r.id);
+      const primaryRank = isAll ? tRank : mRank;
+      const rankCls = primaryRank <= 3 ? `rank-badge rank-badge--${primaryRank}` : 'rank-badge';
+      const rankBlock = isAll
+        ? `<div class="mcard__rank">
+             <span class="mcard__rank-tag">累计</span>
+             <span class="${rankCls}">${tRank}</span>
+           </div>`
+        : `<div class="mcard__rank">
+             <span class="mcard__rank-tag">当月</span>
+             <span class="${rankCls}">${mRank}</span>
+             <span class="mcard__rank-sub">总 ${tRank}</span>
+           </div>`;
+      const monthPts = isAll ? r.total : (r.points[state.month] || 0);
       const hotCls = monthPts >= 400 ? ' hot' : '';
       return `
         <li class="mcard" data-id="${r.id}">
           <div class="mcard__top">
-            <span class="${rankCls}">${rankNum}</span>
+            ${rankBlock}
             <div class="mcard__id">
               <div class="mcard__id-num">${r.id}</div>
               <div class="mcard__nick">${r.nick}</div>
