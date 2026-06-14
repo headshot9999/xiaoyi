@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#00B5EF" />
+  <title>服务达人挑战赛</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="phone">
+    <!-- 顶部 App Bar -->
+    <header class="appbar">
+      <button class="appbar__back" aria-label="返回">‹</button>
+      <h1 class="appbar__title">服务达人挑战赛</h1>
+      <button class="appbar__more" aria-label="更多">⋯</button>
+    </header>
+
+    <!-- 蓝色头部区 -->
+    <div class="hero">
+      <div class="hero__row">
+        <div class="hero__who">
+          <div class="hero__name">王晓艺</div>
+          <div class="hero__meta">工号 SV-100238</div>
+        </div>
+        <div class="hero__rank">
+          <span class="hero__rank-num" id="rankNum">第 6 / 8 名</span>
+          <span class="hero__rank-label" id="rankLabel">当月 / 总排名</span>
+        </div>
+      </div>
+
+      <div class="hero__stats">
+        <div class="mini-stat">
+          <span class="mini-stat__value" id="statMembers">0</span>
+          <span class="mini-stat__label">绑定会员</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat__value" id="statMonthPoints">0</span>
+          <span class="mini-stat__label">本月积分</span>
+        </div>
+        <div class="mini-stat">
+          <span class="mini-stat__value" id="statTotalPoints">0</span>
+          <span class="mini-stat__label">累计积分</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 内容滚动区 -->
+    <main class="content">
+      <!-- 搜索 -->
+      <div class="searchbar">
+        <span class="searchbar__icon">🔍</span>
+        <input type="text" id="memberInput" placeholder="搜索会员号 / 昵称" autocomplete="off" />
+        <button class="searchbar__filter" id="filterToggle" aria-label="高级筛选">
+          <span class="searchbar__filter-icon">⚙</span>
+          <span class="dot" id="filterDot" hidden></span>
+        </button>
+      </div>
+
+      <!-- 月份筛选（日期控件） -->
+      <div class="month-filter">
+        <span class="month-filter__label">积分月份</span>
+        <div class="month-filter__controls">
+          <label class="month-picker" id="monthPickerWrap">
+            <span class="month-picker__icon">📅</span>
+            <input type="month" id="monthPicker" min="2026-01" max="2026-06" value="2026-06" />
+          </label>
+          <button class="month-all" id="monthAllBtn" type="button">全部累计</button>
+        </div>
+      </div>
+
+      <!-- 高级筛选面板 -->
+      <div class="adv" id="advPanel" hidden>
+        <div class="adv__field">
+          <label for="bindStart">绑定时间（起）</label>
+          <input type="date" id="bindStart" />
+        </div>
+        <div class="adv__field">
+          <label for="bindEnd">绑定时间（止）</label>
+          <input type="date" id="bindEnd" />
+        </div>
+        <div class="adv__field">
+          <label for="sortSelect">排序方式</label>
+          <select id="sortSelect">
+            <option value="month-desc">所选月积分（高→低）</option>
+            <option value="month-asc">所选月积分（低→高）</option>
+            <option value="total-desc">累计积分（高→低）</option>
+            <option value="total-asc">累计积分（低→高）</option>
+            <option value="bind-desc">绑定时间（新→旧）</option>
+            <option value="bind-asc">绑定时间（旧→新）</option>
+          </select>
+        </div>
+        <div class="adv__actions">
+          <button class="btn btn--ghost" id="resetBtn">重置</button>
+          <button class="btn btn--primary" id="applyBtn">应用</button>
+        </div>
+      </div>
+
+      <!-- 列表头 -->
+      <div class="list-head">
+        <span class="list-head__title" id="listTitle">绑定会员明细</span>
+      </div>
+
+      <!-- 卡片列表 -->
+      <ul class="cards" id="cardList"></ul>
+
+      <!-- 空状态 -->
+      <div class="empty" id="emptyState" hidden>
+        <div class="empty__icon">🔍</div>
+        <p class="empty__text">没有符合条件的会员</p>
+        <button class="btn btn--ghost" id="emptyResetBtn">清除筛选</button>
+      </div>
+
+      <!-- 加载更多 -->
+      <button class="loadmore" id="loadMoreBtn" hidden>加载更多</button>
+
+      <p class="content__foot">数据每日 00:00 更新 · 本页面为 UI 演示，数据为模拟生成</p>
+    </main>
+
+    <!-- 悬浮「绑定会员」按钮 -->
+    <button class="fab" id="bindFab">
+      <span class="fab__plus">＋</span> 绑定会员
+    </button>
+
+    <!-- 遮罩 -->
+    <div class="backdrop" id="backdrop" hidden></div>
+
+    <!-- 会员积分贡献明细弹层 -->
+    <section class="sheet" id="detailSheet" hidden aria-hidden="true">
+      <div class="sheet__handle"></div>
+      <div class="sheet__head">
+        <div>
+          <div class="sheet__title" id="detailId">会员号</div>
+          <div class="sheet__sub" id="detailNick">昵称</div>
+        </div>
+        <button class="sheet__close" id="detailClose" aria-label="关闭">×</button>
+      </div>
+
+      <div class="detail-summary">
+        <div class="detail-summary__item">
+          <span class="detail-summary__label">绑定时间</span>
+          <span class="detail-summary__value" id="detailBind">—</span>
+        </div>
+        <div class="detail-summary__item">
+          <span class="detail-summary__label">累计贡献积分</span>
+          <span class="detail-summary__value detail-summary__value--hl" id="detailTotal">0</span>
+        </div>
+      </div>
+
+      <div class="detail-section-title">
+        每月计分订单
+        <span class="detail-section-hint">每月仅 1 笔订单计入挑战赛积分</span>
+      </div>
+      <ul class="detail-months" id="detailMonths"></ul>
+    </section>
+
+    <!-- 绑定会员弹层 -->
+    <section class="sheet" id="bindSheet" hidden aria-hidden="true">
+      <div class="sheet__handle"></div>
+      <div class="sheet__head">
+        <div class="sheet__title">绑定新会员</div>
+        <button class="sheet__close" id="bindClose" aria-label="关闭">×</button>
+      </div>
+
+      <div class="bind-form">
+        <div class="adv__field">
+          <label for="bindMemberId">会员号</label>
+          <input type="text" id="bindMemberId" placeholder="请输入会员号，如 M20261099" autocomplete="off" />
+        </div>
+        <div class="adv__field">
+          <label for="bindMemberNick">会员昵称（选填）</label>
+          <input type="text" id="bindMemberNick" placeholder="请输入会员昵称" autocomplete="off" />
+        </div>
+        <p class="bind-form__tip" id="bindTip" hidden></p>
+        <button class="btn btn--primary btn--block" id="bindConfirm">确认绑定</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
