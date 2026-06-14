@@ -86,9 +86,8 @@ input, select, button { font-family: inherit; }
 .hero__who { flex: 1; min-width: 0; }
 .hero__name { font-size: 16px; font-weight: 700; }
 .hero__meta { font-size: 12px; color: rgba(255,255,255,.86); margin-top: 2px; }
-.hero__rank { display: flex; gap: 14px; flex-shrink: 0; }
-.hero__rank-item { text-align: center; }
-.hero__rank-num { display: block; font-size: 17px; font-weight: 800; white-space: nowrap; }
+.hero__rank { text-align: right; flex-shrink: 0; }
+.hero__rank-num { display: block; font-size: 18px; font-weight: 800; white-space: nowrap; }
 .hero__rank-label { font-size: 11px; color: rgba(255,255,255,.82); white-space: nowrap; }
 
 .hero__stats {

@@ -66,10 +66,8 @@
     statMembers: $('statMembers'),
     statMonthPoints: $('statMonthPoints'),
     statTotalPoints: $('statTotalPoints'),
-    rankMonth: $('rankMonth'),
-    rankMonthLabel: $('rankMonthLabel'),
-    rankMonthItem: $('rankMonthItem'),
-    rankTotal: $('rankTotal'),
+    rankNum: $('rankNum'),
+    rankLabel: $('rankLabel'),
     // 悬浮按钮 & 弹层
     bindFab: $('bindFab'),
     backdrop: $('backdrop'),
@@ -167,16 +165,15 @@
     return state.month === 'all' ? '累计积分' : (state.month.slice(5) + ' 月积分');
   }
 
-  // 右上角：当月排名 + 总排名（服务达人本人）
+  // 右上角：当月排名 / 总排名（服务达人本人，紧凑展示）
   function renderExpertRank() {
-    els.rankTotal.textContent = '第 ' + EXPERT_RANK.total + ' 名';
     if (state.month === 'all') {
-      els.rankMonthItem.hidden = true;
+      els.rankNum.textContent = '第 ' + EXPERT_RANK.total + ' 名';
+      els.rankLabel.textContent = '总排名';
     } else {
-      els.rankMonthItem.hidden = false;
       const r = EXPERT_RANK.months[state.month];
-      els.rankMonth.textContent = r ? ('第 ' + r + ' 名') : '—';
-      els.rankMonthLabel.textContent = state.month.slice(5) + ' 月排名';
+      els.rankNum.textContent = '第 ' + (r || '—') + ' / ' + EXPERT_RANK.total + ' 名';
+      els.rankLabel.textContent = state.month.slice(5) + ' 月 / 总排名';
     }
   }
 
