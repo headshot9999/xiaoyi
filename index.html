@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>服务达人挑战赛</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 顶部横幅 -->
+    <header class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__content">
+        <div class="hero__left">
+          <span class="hero__badge">🏆 限时活动进行中</span>
+          <h1 class="hero__title">服务达人挑战赛</h1>
+          <p class="hero__subtitle">绑定会员越多，专属积分回馈越多。冲榜赢好礼，做服务达人！</p>
+        </div>
+
+        <div class="expert-card" id="expertCard">
+          <div class="expert-card__avatar">达</div>
+          <div class="expert-card__info">
+            <div class="expert-card__name">王晓艺 <span class="expert-card__tag">服务达人</span></div>
+            <div class="expert-card__meta">工号 SV-100238 · 华东大区</div>
+          </div>
+          <div class="expert-card__rank">
+            <span class="expert-card__rank-num" id="expertRank">第 6 名</span>
+            <span class="expert-card__rank-label">当前赛季排名</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- 统计卡片 -->
+      <section class="stats" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--blue">👥</div>
+          <div class="stat-card__body">
+            <div class="stat-card__value" id="statMembers">0</div>
+            <div class="stat-card__label">绑定成功会员</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green">✨</div>
+          <div class="stat-card__body">
+            <div class="stat-card__value" id="statMonthPoints">0</div>
+            <div class="stat-card__label">本月贡献积分</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--orange">📈</div>
+          <div class="stat-card__body">
+            <div class="stat-card__value" id="statTotalPoints">0</div>
+            <div class="stat-card__label">累计贡献积分</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--purple">🔥</div>
+          <div class="stat-card__body">
+            <div class="stat-card__value" id="statActive">0</div>
+            <div class="stat-card__label">本月活跃会员</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 查询筛选 -->
+      <section class="panel filters">
+        <div class="filters__row">
+          <div class="field">
+            <label for="memberInput">会员号</label>
+            <input type="text" id="memberInput" placeholder="输入会员号搜索，如 M2026" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label for="monthSelect">月份</label>
+            <select id="monthSelect"></select>
+          </div>
+
+          <div class="field">
+            <label for="bindStart">绑定时间（起）</label>
+            <input type="date" id="bindStart" />
+          </div>
+
+          <div class="field">
+            <label for="bindEnd">绑定时间（止）</label>
+            <input type="date" id="bindEnd" />
+          </div>
+
+          <div class="field">
+            <label for="sortSelect">排序</label>
+            <select id="sortSelect">
+              <option value="month-desc">所选月积分（高→低）</option>
+              <option value="month-asc">所选月积分（低→高）</option>
+              <option value="total-desc">累计积分（高→低）</option>
+              <option value="total-asc">累计积分（低→高）</option>
+              <option value="bind-desc">绑定时间（新→旧）</option>
+              <option value="bind-asc">绑定时间（旧→新）</option>
+            </select>
+          </div>
+
+          <div class="field field--actions">
+            <button class="btn btn--primary" id="searchBtn">查询</button>
+            <button class="btn btn--ghost" id="resetBtn">重置</button>
+          </div>
+        </div>
+
+        <div class="filters__active" id="activeFilters"></div>
+      </section>
+
+      <!-- 列表 -->
+      <section class="panel">
+        <div class="table-head">
+          <h2 class="table-head__title">绑定会员明细</h2>
+          <div class="table-head__right">
+            <span class="result-count" id="resultCount">共 0 条</span>
+            <button class="btn btn--soft" id="exportBtn">导出</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-rank">排名</th>
+                <th>会员号</th>
+                <th>会员昵称</th>
+                <th>绑定时间</th>
+                <th class="col-num" id="monthColHead">当月贡献积分</th>
+                <th class="col-num">累计贡献积分</th>
+                <th class="col-status">状态</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+
+          <div class="empty" id="emptyState" hidden>
+            <div class="empty__icon">🔍</div>
+            <p class="empty__text">没有符合条件的会员</p>
+            <button class="btn btn--ghost" id="emptyResetBtn">清除筛选条件</button>
+          </div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>服务达人挑战赛 · 数据每日 00:00 更新 · 本页面为 UI 演示，数据为模拟生成</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
