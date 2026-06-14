@@ -86,9 +86,10 @@ input, select, button { font-family: inherit; }
 .hero__who { flex: 1; min-width: 0; }
 .hero__name { font-size: 16px; font-weight: 700; }
 .hero__meta { font-size: 12px; color: rgba(255,255,255,.86); margin-top: 2px; }
-.hero__rank { text-align: right; flex-shrink: 0; }
-.hero__rank-num { display: block; font-size: 17px; font-weight: 800; }
-.hero__rank-label { font-size: 11px; color: rgba(255,255,255,.82); }
+.hero__rank { display: flex; gap: 14px; flex-shrink: 0; }
+.hero__rank-item { text-align: center; }
+.hero__rank-num { display: block; font-size: 17px; font-weight: 800; white-space: nowrap; }
+.hero__rank-label { font-size: 11px; color: rgba(255,255,255,.82); white-space: nowrap; }
 
 .hero__stats {
   display: grid;
@@ -227,22 +228,6 @@ input, select, button { font-family: inherit; }
   box-shadow: var(--shadow-card);
 }
 .mcard__top { display: flex; align-items: center; gap: 10px; }
-.mcard__rank {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  width: 46px; flex-shrink: 0;
-}
-.mcard__rank-tag { font-size: 10px; color: var(--ink-3); line-height: 1; }
-.mcard__rank-sub { font-size: 10px; color: var(--ink-3); line-height: 1; white-space: nowrap; }
-.rank-badge {
-  display: grid; place-items: center;
-  width: 30px; height: 28px; border-radius: 9px;
-  font-weight: 800; font-size: 14px;
-  background: #eef3f7; color: var(--ink-2); flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-.rank-badge--1 { background: linear-gradient(135deg,#ffd76e,#ffb020); color:#6b4500; }
-.rank-badge--2 { background: linear-gradient(135deg,#e3e8ef,#c4ccd8); color:#4a5160; }
-.rank-badge--3 { background: linear-gradient(135deg,#f4c89a,#e0a36a); color:#6a3c12; }
 .mcard { cursor: pointer; transition: transform .1s ease, box-shadow .15s ease; }
 .mcard:active { transform: scale(.99); box-shadow: var(--shadow-pop); }
 .mcard__id { flex: 1; min-width: 0; }
