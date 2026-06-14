@@ -17,6 +17,20 @@
   function randInt(min, max) { return Math.floor(rand() * (max - min + 1)) + min; }
   function pick(arr) { return arr[Math.floor(rand() * arr.length)]; }
 
+  // 将某月总积分拆分为 k 笔订单（每笔 >= 1，且之和等于总积分）
+  function splitPoints(total, k) {
+    k = Math.max(1, Math.min(k, total));
+    const parts = new Array(k).fill(1);
+    let rem = total - k;
+    while (rem > 0) {
+      const i = Math.floor(rand() * k);
+      const add = Math.min(rem, randInt(1, Math.max(1, Math.ceil(rem / 2))));
+      parts[i] += add;
+      rem -= add;
+    }
+    return parts;
+  }
+
   function generateMembers(count) {
     const list = [];
     for (let i = 0; i < count; i++) {
@@ -26,12 +40,28 @@
       const bindDate = `${MONTHS[bindMonthIdx]}-${String(bindDay).padStart(2, '0')}`;
       const bindTime = `${bindDate} ${String(randInt(8, 22)).padStart(2, '0')}:${String(randInt(0, 59)).padStart(2, '0')}`;
       const points = {};
+      const orders = [];
       MONTHS.forEach((m, idx) => {
         if (idx < bindMonthIdx) { points[m] = 0; return; }
-        points[m] = rand() < 0.3 ? 0 : randInt(20, 680);
+        const p = rand() < 0.3 ? 0 : randInt(20, 680);
+        points[m] = p;
+        if (p > 0) {
+          const parts = splitPoints(p, randInt(1, 4));
+          parts.forEach((pts) => {
+            const day = randInt(1, 28);
+            const hh = String(randInt(8, 22)).padStart(2, '0');
+            const mm = String(randInt(0, 59)).padStart(2, '0');
+            orders.push({
+              no: 'AO' + m.replace('-', '') + String(randInt(10000, 99999)),
+              datetime: `${m}-${String(day).padStart(2, '0')} ${hh}:${mm}`,
+              month: m,
+              points: pts,
+            });
+          });
+        }
       });
       const total = Object.values(points).reduce((a, b) => a + b, 0);
-      list.push({ id, nick: pick(NICK_PREFIX) + pick(NICK_SUFFIX), bindTime, bindDate, points, total });
+      list.push({ id, nick: pick(NICK_PREFIX) + pick(NICK_SUFFIX), bindTime, bindDate, points, total, orders });
     }
     return list;
   }
@@ -254,19 +284,34 @@
     els.detailBind.textContent = m.bindTime;
     els.detailTotal.textContent = fmtNum(m.total);
 
-    const maxPts = Math.max(1, ...MONTHS.map((mo) => m.points[mo] || 0));
-    els.detailMonths.innerHTML = MONTHS.slice().reverse().map((mo) => {
-      const pts = m.points[mo] || 0;
-      const pct = Math.round((pts / maxPts) * 100);
-      return `
-        <li class="dm-row">
-          <div class="dm-row__top">
-            <span class="dm-row__month">${mo.replace('-', ' 年 ')} 月</span>
-            <span class="dm-row__pts ${pts === 0 ? 'dm-row__pts--zero' : ''}">${pts > 0 ? '+' + fmtNum(pts) : '— 未贡献'}</span>
-          </div>
-          <div class="dm-bar"><div class="dm-bar__fill" style="width:${pct}%"></div></div>
-        </li>`;
-    }).join('');
+    const monthsWithOrders = MONTHS.slice().reverse()
+      .filter((mo) => m.orders.some((o) => o.month === mo));
+
+    if (monthsWithOrders.length === 0) {
+      els.detailMonths.innerHTML = '<li class="detail-empty">该会员暂无积分贡献订单</li>';
+    } else {
+      els.detailMonths.innerHTML = monthsWithOrders.map((mo) => {
+        const list = m.orders.filter((o) => o.month === mo)
+          .sort((a, b) => b.datetime.localeCompare(a.datetime));
+        const sum = list.reduce((s, o) => s + o.points, 0);
+        const rows = list.map((o) => `
+          <li class="order-item">
+            <div class="order-item__main">
+              <span class="order-item__no">订单号 ${o.no}</span>
+              <span class="order-item__time">${o.datetime}</span>
+            </div>
+            <span class="order-item__pts">+${fmtNum(o.points)}</span>
+          </li>`).join('');
+        return `
+          <li class="dm-group">
+            <div class="dm-group__head">
+              <span class="dm-group__month">${mo.replace('-', ' 年 ')} 月</span>
+              <span class="dm-group__sum">合计 +${fmtNum(sum)}（${list.length} 笔）</span>
+            </div>
+            <ul class="order-list">${rows}</ul>
+          </li>`;
+      }).join('');
+    }
 
     openSheet(els.detailSheet);
   }
@@ -306,6 +351,7 @@
       bindDate: bindTime.slice(0, 10),
       points,
       total: 0,
+      orders: [],
     });
     showTip('绑定成功！', 'ok');
     state.visible = PAGE_SIZE;
