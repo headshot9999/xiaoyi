@@ -8,23 +8,23 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Inches, Pt
 
-SERIF = "Noto Serif CJK SC"
-SERIF_M = "Noto Serif CJK SC Medium"
 SANS = "Noto Sans CJK SC"
 SANS_M = "Noto Sans CJK SC Medium"
 
-INK = "1C1916"
-INK2 = "3A342F"
-PAPER = "F4F0E8"
-CREAM = "F7F3EB"
-MUTED = "7C756E"
-FAINT = "C9C1B6"
-LACQUER = "8E2E2A"
-LACQUER_DEEP = "6F2421"
+WHITE = "FFFFFF"
+INK = "121212"
+SUB = "5E5E5E"
+SOFT = "F4F4F4"
+LINE = "E6E6E6"
+RED = "D0121A"
+DARK = "111111"
+GRAY = "8A8A8A"
+ON_DARK = "F3F3F3"
+ON_DARK_DIM = "A0A0A0"
 
 W = 13.333333
 H = 7.5
-MX = 0.78
+ML = 0.62
 
 
 def rgb(h):
@@ -32,14 +32,13 @@ def rgb(h):
 
 
 def _anchor(tf, valign):
-    body = tf._txBody
-    bodyPr = body.find(qn("a:bodyPr"))
+    bodyPr = tf._txBody.find(qn("a:bodyPr"))
     bodyPr.set("anchor", {"top": "t", "middle": "ctr", "bottom": "b"}[valign])
     for key in ("lIns", "rIns", "tIns", "bIns"):
         bodyPr.set(key, "0")
 
 
-def _run(p, text, font, size, color, tracking=0):
+def _run(p, text, font, size, color):
     run = p.add_run()
     run.text = text
     run.font.size = Pt(size)
@@ -50,8 +49,6 @@ def _run(p, text, font, size, color, tracking=0):
     rPr = run._r.get_or_add_rPr()
     rPr.set("lang", "zh-CN")
     rPr.set("altLang", "en-US")
-    if tracking:
-        rPr.set("spc", str(int(tracking * 100)))
     for tag in ("latin", "ea", "cs"):
         el = rPr.find(qn(f"a:{tag}"))
         if el is None:
@@ -81,23 +78,9 @@ def tb(slide, x, y, w, h, paragraphs, valign="top"):
         runs = info.get("runs")
         if runs:
             for r in runs:
-                _run(
-                    p,
-                    r["text"],
-                    r.get("font", SANS),
-                    r["size"],
-                    r["color"],
-                    r.get("tracking", 0),
-                )
+                _run(p, r["text"], r.get("font", SANS), r["size"], r["color"])
         else:
-            _run(
-                p,
-                info["text"],
-                info.get("font", SANS),
-                info["size"],
-                info["color"],
-                info.get("tracking", 0),
-            )
+            _run(p, info["text"], info.get("font", SANS), info["size"], info["color"])
     return shape
 
 
@@ -109,18 +92,10 @@ def rect(slide, x, y, w, h, fill):
     return sh
 
 
-def rule(slide, x, y, w, color, pt=1.15):
-    sh = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Pt(pt))
+def oval(slide, x, y, s, fill):
+    sh = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(y), Inches(s), Inches(s))
     sh.fill.solid()
-    sh.fill.fore_color.rgb = rgb(color)
-    sh.line.fill.background()
-    return sh
-
-
-def vrule(slide, x, y, h, color, pt=1.0):
-    sh = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Pt(pt), Inches(h))
-    sh.fill.solid()
-    sh.fill.fore_color.rgb = rgb(color)
+    sh.fill.fore_color.rgb = rgb(fill)
     sh.line.fill.background()
     return sh
 
@@ -134,61 +109,25 @@ def notes(slide, text):
     slide.notes_slide.notes_text_frame.text = text
 
 
-def footer(slide, n, total, dark=False):
-    color = "A3988C" if dark else MUTED
-    tb(
-        slide,
-        MX,
-        7.05,
-        6.5,
-        0.28,
-        [{"text": "艾多美  ·  一百兆韩元", "font": SANS, "size": 11, "color": color, "tracking": 1.2}],
-    )
-    tb(
-        slide,
-        10.4,
-        7.05,
-        2.15,
-        0.28,
-        [
-            {
-                "text": f"{n:02d}  /  {total:02d}",
-                "font": SANS,
-                "size": 11,
-                "color": color,
-                "align": "right",
-                "tracking": 1.4,
-            }
-        ],
-    )
-
-
-def kicker(slide, text, dark=False):
-    color = "E4C7B4" if dark else LACQUER
-    tb(
-        slide,
-        MX,
-        0.42,
-        10,
-        0.32,
-        [{"text": text, "font": SANS_M, "size": 12, "color": color, "tracking": 2.4}],
-    )
-    rule(slide, MX, 0.82, 0.46, color, 1.35)
-
-
-def title(slide, text, y=0.98, size=32, color=INK, h=0.62):
-    tb(
-        slide,
-        MX,
-        y,
-        11.7,
-        h,
-        [{"text": text, "font": SERIF_M, "size": size, "color": color}],
-    )
-
-
 def new(prs):
     return prs.slides.add_slide(prs.slide_layouts[6])
+
+
+def page(slide, n, total, dark=False):
+    tb(
+        slide,
+        11.15,
+        7.08,
+        1.55,
+        0.26,
+        [{"text": f"{n:02d}  /  {total:02d}", "font": SANS, "size": 11, "color": "6E6E6E" if dark else "B0B0B0", "align": "right"}],
+    )
+
+
+def header(slide, section, title):
+    rect(slide, 0, 0, W, 0.08, RED)
+    tb(slide, ML, 0.32, 8, 0.28, [{"text": section, "font": SANS, "size": 13, "color": RED}])
+    tb(slide, ML, 0.64, 12, 0.58, [{"text": title, "font": SANS_M, "size": 32, "color": INK}])
 
 
 def build():
@@ -196,617 +135,384 @@ def build():
     prs.slide_width = Emu(12192000)
     prs.slide_height = Emu(6858000)
     prs.core_properties.title = "艾多美何以成为100兆韩元企业"
-    prs.core_properties.subject = "蒙想讯息 · 二〇二六年九月二十二日"
-    prs.core_properties.author = "艾多美课题论证"
-    total = 16
+    prs.core_properties.subject = "蒙想讯息 · 2026年9月22日"
+    total = 15
 
     # 01 cover
     s = new(prs)
-    bg(s, INK)
+    bg(s, DARK)
+    rect(s, 0, 0, 0.14, H, RED)
+    tb(s, 0.85, 0.72, 10, 0.32, [{"text": "蒙想讯息  ·  2026年9月22日", "font": SANS, "size": 15, "color": ON_DARK_DIM}])
     tb(
         s,
-        MX,
-        0.62,
-        8,
-        0.32,
-        [{"text": "蒙想讯息   ·   二〇二六年九月二十二日", "font": SANS, "size": 13, "color": "C8B8A4", "tracking": 1.6}],
-    )
-    rule(s, MX, 1.12, 1.15, LACQUER, 1.5)
-    tb(
-        s,
-        MX,
-        2.05,
-        11,
-        1.15,
-        [{"text": "艾多美何以成为", "font": SERIF, "size": 54, "color": CREAM}],
-    )
-    tb(
-        s,
-        MX,
-        3.25,
+        0.82,
+        2.15,
         11.5,
-        1.2,
-        [{"text": "一百兆韩元企业", "font": SERIF, "size": 54, "color": CREAM}],
+        2.15,
+        [
+            {"text": "艾多美何以成为", "font": SANS_M, "size": 48, "color": WHITE, "after": 6},
+            {"text": "一百兆韩元企业", "font": SANS_M, "size": 48, "color": WHITE},
+        ],
     )
-    tb(
-        s,
-        MX,
-        4.85,
-        10,
-        0.4,
-        [{"text": "把口号写成结构", "font": SERIF_M, "size": 20, "color": "E4C7B4"}],
-    )
-    tb(
-        s,
-        MX,
-        6.45,
-        10,
-        0.32,
-        [{"text": "一贯工程     一能一品     三 A", "font": SANS, "size": 13, "color": "A3988C", "tracking": 2.2}],
-    )
-    footer(s, 1, total, dark=True)
-    notes(s, "开场不要解释标题。停一拍，直接进入下一页的两个数字。")
+    rect(s, 0.85, 4.6, 1.35, 0.045, RED)
+    tb(s, 0.85, 4.85, 8, 0.4, [{"text": "把口号写成结构", "font": SANS, "size": 20, "color": "D0D0D0"}])
+    page(s, 1, total, dark=True)
+    notes(s, "停一拍。下一页直接给两个数字。")
 
     # 02 tenfold
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "问题")
-    title(s, "十倍，就在这段年月里")
-    tb(s, MX, 2.05, 5, 0.3, [{"text": "眼下的第一", "font": SANS, "size": 14, "color": MUTED, "tracking": 1.5}])
-    tb(s, MX, 2.4, 5.4, 1.35, [{"text": "十兆", "font": SERIF, "size": 72, "color": INK}])
-    tb(
-        s,
-        MX,
-        3.9,
-        5.2,
-        0.85,
-        [
-            {"text": "大约六十年", "font": SANS_M, "size": 18, "color": INK2, "after": 4},
-            {"text": "安利。行业里走在前面的那个数字。", "font": SANS, "size": 15, "color": MUTED, "line": 1.35},
-        ],
-    )
-    vrule(s, 6.55, 2.15, 3.15, FAINT, 1.0)
-    tb(s, 7.05, 2.05, 5.4, 0.3, [{"text": "要去的地方", "font": SANS, "size": 14, "color": LACQUER, "tracking": 1.5}])
-    tb(s, 7.05, 2.4, 5.5, 1.35, [{"text": "一百兆", "font": SERIF, "size": 72, "color": LACQUER}])
-    tb(
-        s,
-        7.05,
-        3.9,
-        5.3,
-        0.9,
-        [
-            {"text": "大约十五年", "font": SANS_M, "size": 18, "color": INK2, "after": 4},
-            {"text": "蒙想还在的年月。不是一百年之后。", "font": SANS, "size": 15, "color": MUTED, "line": 1.35},
-        ],
-    )
-    rule(s, MX, 5.55, 11.75, FAINT, 1.0)
-    tb(
-        s,
-        MX,
-        5.75,
-        11.7,
-        0.7,
-        [
-            {
-                "text": "再往后，是千兆。要比过的，是沃尔玛，是亚马逊。",
-                "font": SERIF_M,
-                "size": 18,
-                "color": INK,
-            }
-        ],
-    )
-    footer(s, 2, total)
-    notes(s, "先把落差放上桌。十兆用了六十年。一百兆要在大约十五年里走到。听众若不信，后面的每一页都是写给这个不信的。")
+    bg(s, WHITE)
+    rect(s, 0, 0, 6.35, H, DARK)
+    rect(s, 6.35, 0, 0.08, H, RED)
+    tb(s, 0.7, 1.85, 5, 0.32, [{"text": "眼下的第一", "font": SANS, "size": 15, "color": ON_DARK_DIM}])
+    tb(s, 0.66, 2.3, 5.3, 1.25, [{"text": "十兆", "font": SANS_M, "size": 76, "color": WHITE}])
+    tb(s, 0.7, 3.75, 5, 0.4, [{"text": "大约六十年", "font": SANS_M, "size": 22, "color": ON_DARK}])
+    tb(s, 0.7, 4.35, 5, 0.8, [{"text": "安利。行业里走在前面的那个数字。", "font": SANS, "size": 16, "color": ON_DARK_DIM, "line": 1.4}])
+    tb(s, 7.05, 1.85, 5.5, 0.32, [{"text": "要去的地方", "font": SANS, "size": 15, "color": RED}])
+    tb(s, 7.0, 2.3, 5.8, 1.25, [{"text": "一百兆", "font": SANS_M, "size": 72, "color": RED}])
+    tb(s, 7.05, 3.75, 5.5, 0.4, [{"text": "大约十五年", "font": SANS_M, "size": 22, "color": INK}])
+    tb(s, 7.05, 4.35, 5.5, 0.85, [{"text": "蒙想还在的年月。不是一百年之后。", "font": SANS, "size": 16, "color": SUB, "line": 1.4}])
+    tb(s, 7.05, 6.15, 5.6, 0.7, [{"text": "再往后，是千兆。\n要比过的，是沃尔玛，是亚马逊。", "font": SANS, "size": 16, "color": INK, "line": 1.45}])
+    page(s, 2, total)
+    notes(s, "十兆用了大约六十年。一百兆要在大约十五年里走到。后面每一页，都是写给不信这件事的人。")
 
     # 03 standard
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "标准")
-    title(s, "信念握得住口号")
+    bg(s, WHITE)
+    header(s, "标准", "信念握得住口号")
+    rect(s, ML, 1.85, 5.85, 4.55, SOFT)
+    rect(s, 6.85, 1.85, 5.85, 4.55, DARK)
+    tb(s, 0.95, 2.15, 5.2, 0.55, [{"text": "信念", "font": SANS_M, "size": 28, "color": INK}])
     tb(
         s,
-        MX,
-        1.85,
-        11.5,
-        0.45,
-        [{"text": "一百兆若只是被喊出来，它还停在念头里。", "font": SANS, "size": 16, "color": INK2}],
+        0.95,
+        3.0,
+        5.15,
+        2.6,
+        [{"text": "中心是自己。\n喊一喊，念头会更紧。\n一百兆不会因此发生。", "font": SANS, "size": 20, "color": SUB, "line": 1.55}],
     )
-    rule(s, MX, 2.55, 5.15, FAINT, 1.0)
-    rule(s, 7.15, 2.55, 5.35, LACQUER, 1.15)
-    tb(s, MX, 2.8, 5.3, 0.45, [{"text": "信念", "font": SERIF_M, "size": 28, "color": INK}])
+    tb(s, 7.18, 2.15, 5.2, 0.55, [{"text": "结构", "font": SANS_M, "size": 28, "color": WHITE}])
     tb(
         s,
-        MX,
-        3.5,
-        5.2,
-        2.2,
-        [
-            {
-                "text": "中心是自己。\n喊一喊，念头会更紧。\n一百兆不会因此发生。",
-                "font": SANS,
-                "size": 18,
-                "color": INK2,
-                "line": 1.55,
-            }
-        ],
+        7.18,
+        3.0,
+        5.15,
+        2.6,
+        [{"text": "中心是事情本身。\n信，或者不信，它都往那里去。\n论证要写给不信的人。", "font": SANS, "size": 20, "color": "E4E4E4", "line": 1.55}],
     )
-    tb(s, 7.15, 2.8, 5.4, 0.45, [{"text": "结构", "font": SERIF_M, "size": 28, "color": LACQUER}])
-    tb(
-        s,
-        7.15,
-        3.5,
-        5.3,
-        2.3,
-        [
-            {
-                "text": "中心是事情本身。\n信，或者不信，它都往那里去。\n论证要写给不信的人。",
-                "font": SANS,
-                "size": 18,
-                "color": INK2,
-                "line": 1.55,
-            }
-        ],
-    )
-    footer(s, 3, total)
-    notes(s, "信念是把自己的想法握紧。要的是另一件事：结构如此。后面所有页，都按“不信的人也能跟上”来讲。")
+    page(s, 3, total)
+    notes(s, "信念是把自己的想法握紧。要交的是结构。信与不信，都会看见它往那里去。")
 
-    # 04 battlefield
+    # 04 who
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "战场")
-    title(s, "先把人分开")
+    bg(s, WHITE)
+    header(s, "战场", "先把人分开")
     tb(
         s,
-        MX,
-        1.82,
-        11.6,
-        0.55,
-        [
-            {
-                "text": "亚马逊、沃尔玛、Coupang 把场子铺开，说你们自己挑。教科书接着说，高低都做。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-            }
-        ],
+        ML,
+        1.5,
+        12,
+        0.4,
+        [{"text": "场子铺开，是让人自己挑。教科书接着说，高低都做。方向会因此松掉。", "font": SANS, "size": 16, "color": SUB}],
     )
     rows = [
-        ("01", "丢掉", "最上约 1%", "嫌便宜。东西再好，也不用。"),
-        ("02", "丢掉", "只认便宜", "韩国大约三成。购买力更弱的地方，可以到七成。"),
-        ("03", "留下", "绝对品质，绝对价格", "这一层拿下一半，千兆也撑得住。"),
+        ("01", "丢掉", "最上约 1%", "嫌便宜。东西再好，也不用。", False),
+        ("02", "丢掉", "只认便宜", "韩国大约三成。购买力更弱的地方，可以到七成。", False),
+        ("03", "留下", "绝对品质，绝对价格", "这一层拿下一半，千兆也撑得住。", True),
     ]
-    y = 2.6
-    for idx, (num, verb, head, body) in enumerate(rows):
-        if idx:
-            rule(s, MX, y, 11.75, FAINT, 1.0)
-            y += 0.22
-        tb(s, MX, y, 0.7, 0.42, [{"text": num, "font": SERIF, "size": 18, "color": LACQUER}])
-        tb(s, 1.6, y, 1.3, 0.42, [{"text": verb, "font": SANS, "size": 16, "color": MUTED}])
-        tb(s, 3.05, y, 4.3, 0.42, [{"text": head, "font": SERIF_M, "size": 20, "color": INK}])
-        tb(s, 7.5, y, 5.0, 0.5, [{"text": body, "font": SANS, "size": 15, "color": INK2}])
-        y += 0.95
-    footer(s, 4, total)
-    notes(s, "不要全部市场。最上大约百分之一，和只求最贱的那一层，都放下。一百兆的分母，是同时要绝对品质和绝对价格的人，再取一半。")
+    y = 2.15
+    for num, verb, head, body, on in rows:
+        rect(s, ML, y, 12.08, 1.38, SOFT if on else WHITE)
+        if not on:
+            rect(s, ML, y + 1.36, 12.08, 0.015, LINE)
+        else:
+            rect(s, ML, y, 0.08, 1.38, RED)
+        tb(s, 0.95, y + 0.42, 0.7, 0.45, [{"text": num, "font": SANS_M, "size": 18, "color": RED}])
+        tb(s, 1.75, y + 0.44, 1.2, 0.4, [{"text": verb, "font": SANS, "size": 16, "color": SUB}])
+        tb(s, 3.15, y + 0.38, 4.6, 0.55, [{"text": head, "font": SANS_M, "size": 22, "color": INK}])
+        tb(s, 7.9, y + 0.42, 4.5, 0.55, [{"text": body, "font": SANS, "size": 15, "color": SUB}])
+        y += 1.5
+    page(s, 4, total)
+    notes(s, "不要全部市场。丢掉最上约百分之一，也丢掉只求最贱的那一层。一百兆的分母，是同时要绝对品质和绝对价格的人，再取一半。")
 
-    # 05 35%
+    # 05 35
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "津贴")
-    title(s, "三十五个点，不能向顾客要")
-    tb(s, MX, 1.9, 5.2, 1.5, [{"text": "35%", "font": SERIF, "size": 84, "color": LACQUER}])
+    bg(s, WHITE)
+    header(s, "津贴", "三十五个点，不能向顾客要")
+    rect(s, ML, 1.7, 4.35, 4.7, SOFT)
+    tb(s, 0.9, 2.15, 4, 1.3, [{"text": "35%", "font": SANS_M, "size": 80, "color": RED}])
     tb(
         s,
-        MX,
-        3.55,
-        4.8,
-        1.15,
-        [
-            {
-                "text": "会员侧的津贴。\n早年靠“少了中间商”。\n现在的渠道，大多只过一手。",
-                "font": SANS,
-                "size": 15,
-                "color": INK2,
-                "line": 1.4,
-            }
-        ],
+        0.95,
+        3.7,
+        3.7,
+        2.1,
+        [{"text": "会员侧的津贴。\n早年靠少了中间商。\n现在的渠道，大多只过一手。", "font": SANS, "size": 16, "color": SUB, "line": 1.5}],
     )
-    vrule(s, 6.15, 1.95, 4.35, FAINT, 1.0)
     comps = [
         ("好市多", "毛利为零。年费约八万韩元。买一千万与买一亿，都是这一笔。生产者不另加负担。"),
         ("易买得", "进货比重常在六成到七成。"),
         ("电视购物", "播出费用大约四成二，生产者留下五成八。"),
     ]
-    y = 1.9
+    y = 1.75
     for i, (name, desc) in enumerate(comps):
-        tb(s, 6.55, y, 5.9, 0.32, [{"text": name, "font": SERIF_M, "size": 16, "color": INK}])
-        tb(s, 6.55, y + 0.34, 5.9, 0.7, [{"text": desc, "font": SANS, "size": 13, "color": INK2, "line": 1.25}])
-        y += 1.15
+        tb(s, 5.4, y, 7.2, 0.4, [{"text": name, "font": SANS_M, "size": 20, "color": INK}])
+        tb(s, 5.4, y + 0.48, 7.2, 0.85, [{"text": desc, "font": SANS, "size": 15, "color": SUB, "line": 1.35}])
+        y += 1.55
         if i < 2:
-            rule(s, 6.55, y - 0.12, 5.85, FAINT, 1.0)
-    footer(s, 5, total)
-    notes(s, "向消费者加价，等于在好市多面前认输。对方降不下来的成本，渠道也降不下来。水要喝，先问水源。")
+            rect(s, 5.4, y - 0.18, 7.15, 0.015, LINE)
+    page(s, 5, total)
+    notes(s, "向消费者加价，等于在好市多面前认输。对方降不下来的成本，渠道也降不下来。")
 
     # 06 source
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "水源")
-    title(s, "工序重做之后，三件事同时成立")
-    items = [
-        ("会员", "大约半价"),
-        ("事业者", "津贴还在"),
-        ("公司", "仍有余量"),
+    bg(s, WHITE)
+    header(s, "水源", "三件事要同时成立")
+    cards = [
+        ("01", "会员", "大约半价"),
+        ("02", "事业者", "津贴还在"),
+        ("03", "公司", "仍有余量"),
     ]
-    x = MX
-    for i, (who, what) in enumerate(items):
-        tb(s, x, 2.15, 3.5, 0.35, [{"text": f"0{i+1}", "font": SERIF, "size": 14, "color": LACQUER, "tracking": 1}])
-        tb(s, x, 2.55, 3.5, 0.45, [{"text": who, "font": SANS, "size": 16, "color": MUTED}])
-        tb(s, x, 3.05, 3.6, 0.8, [{"text": what, "font": SERIF_M, "size": 32, "color": INK}])
-        x += 4.0
-    rule(s, MX, 4.35, 11.75, FAINT, 1.0)
+    x = ML
+    for num, who, what in cards:
+        rect(s, x, 1.75, 3.9, 3.15, SOFT)
+        rect(s, x, 1.75, 3.9, 0.08, RED)
+        tb(s, x + 0.32, 2.1, 3.2, 0.35, [{"text": num, "font": SANS_M, "size": 14, "color": RED}])
+        tb(s, x + 0.32, 2.6, 3.2, 0.4, [{"text": who, "font": SANS, "size": 16, "color": SUB}])
+        tb(s, x + 0.32, 3.15, 3.2, 0.9, [{"text": what, "font": SANS_M, "size": 32, "color": INK}])
+        x += 4.15
     tb(
         s,
-        MX,
-        4.65,
-        11.6,
-        1.5,
-        [
-            {
-                "text": "这三十五个点的水源，在生产工序里。\n不是加在价格上，也不是从合作方的利润里硬削下来。",
-                "font": SANS,
-                "size": 18,
-                "color": INK2,
-                "line": 1.55,
-            }
-        ],
+        ML,
+        5.25,
+        12,
+        1.2,
+        [{"text": "这三十五个点的水源，在生产工序里。\n不是加在价格上，也不是从合作方的利润里硬削下来。", "font": SANS, "size": 18, "color": INK, "line": 1.5}],
     )
-    footer(s, 6, total)
-    notes(s, "半价、津贴、公司余量，三件同时成立，靠的是同一处水源。下一页用牙刷把这个算法拆开。")
+    page(s, 6, total)
+    notes(s, "半价、津贴、公司余量，靠的是同一处水源。下一页用牙刷把算法拆开。")
 
     # 07 toothbrush
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "牙刷")
-    title(s, "差出来的，不是毛利")
-    tb(s, MX, 1.85, 6, 1.25, [{"text": "1,200", "font": SERIF, "size": 68, "color": LACQUER}])
-    tb(s, MX, 3.2, 5.5, 0.7, [{"text": "韩元。二十年，没有人跟上。", "font": SANS_M, "size": 16, "color": INK2}])
-    tb(s, 7.15, 2.05, 5, 0.3, [{"text": "市价", "font": SANS, "size": 14, "color": MUTED, "tracking": 1.2}])
-    tb(s, 7.15, 2.4, 5.3, 0.9, [{"text": "2,000–3,000", "font": SERIF, "size": 36, "color": INK}])
-    # bars
-    rect(s, 7.15, 3.45, 5.15, 0.08, FAINT)
-    rect(s, 7.15, 3.45, 2.06, 0.08, LACQUER)
-    tb(s, 7.15, 3.6, 5.2, 0.3, [{"text": "一千八百韩元，叠着三层", "font": SANS, "size": 13, "color": MUTED}])
-    layers = [
-        ("制造", "型号一多，每样只做一点"),
-        ("信任", "广告，和店铺"),
-        ("选择", "挑选，买错，退货"),
-    ]
-    y = 4.25
+    bg(s, WHITE)
+    header(s, "牙刷", "差出来的，不是毛利")
+    tb(s, ML, 1.6, 6, 1.15, [{"text": "1,200", "font": SANS_M, "size": 72, "color": RED}])
+    tb(s, ML, 2.9, 5.5, 0.4, [{"text": "韩元", "font": SANS, "size": 16, "color": SUB}])
+    tb(s, ML, 3.4, 5.5, 0.7, [{"text": "二十年，没有人跟上。", "font": SANS_M, "size": 18, "color": INK}])
+    rect(s, 6.7, 1.65, 6.0, 3.55, SOFT)
+    tb(s, 7.0, 1.85, 5.4, 0.3, [{"text": "市价", "font": SANS, "size": 14, "color": SUB}])
+    tb(s, 7.0, 2.2, 5.4, 0.7, [{"text": "2,000 – 3,000", "font": SANS_M, "size": 32, "color": INK}])
+    rect(s, 7.0, 3.1, 5.4, 0.1, "E4E4E4")
+    rect(s, 7.0, 3.1, 2.16, 0.1, RED)
+    tb(s, 7.0, 3.35, 5.4, 0.3, [{"text": "差价里叠着三层", "font": SANS, "size": 13, "color": SUB}])
+    layers = [("制造", "型号一多，每样只做一点"), ("信任", "广告，和店铺"), ("选择", "挑选，买错，退货")]
+    yy = 3.8
     for name, desc in layers:
-        tb(s, MX, y, 1.3, 0.4, [{"text": name, "font": SERIF_M, "size": 16, "color": LACQUER}])
-        tb(s, 2.2, y, 9.5, 0.4, [{"text": desc, "font": SANS, "size": 16, "color": INK2}])
-        y += 0.55
-    footer(s, 7, total)
-    notes(s, "一个造型。嘴不变，模具不改。腔数做大，原料买吨袋，货款付现金。策展若停在挑一个现成的好货，Coupang 明天就能做。")
+        tb(s, 7.0, yy, 1.15, 0.35, [{"text": name, "font": SANS_M, "size": 15, "color": RED}])
+        tb(s, 8.2, yy, 4.1, 0.35, [{"text": desc, "font": SANS, "size": 15, "color": INK}])
+        yy += 0.4
+    tb(s, ML, 5.6, 12, 0.8, [{"text": "一个造型。腔数做大，原料买吨袋，货款付现金。\n策展若停在挑一件现成的好货，别人明天就能做。", "font": SANS, "size": 16, "color": SUB, "line": 1.45}])
+    page(s, 7, total)
+    notes(s, "人的嘴不变，模具就不改。把产量聚到一个造型上，成本才下得去。")
 
     # 08 HemoHIM
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "HemoHIM")
-    title(s, "草根煮一煮，为什么那么贵")
-    tb(s, MX, 1.9, 5.2, 1.05, [{"text": "770,000", "font": SERIF, "size": 48, "color": MUTED}])
-    tb(s, 6.35, 2.15, 0.8, 0.55, [{"text": "→", "font": SERIF, "size": 32, "color": LACQUER, "align": "center"}])
-    tb(s, 7.2, 1.85, 5.3, 1.15, [{"text": "76,500", "font": SERIF, "size": 54, "color": LACQUER}])
+    bg(s, WHITE)
+    header(s, "HemoHIM", "草根煮一煮，为什么那么贵")
+    rect(s, ML, 1.6, 5.7, 2.15, SOFT)
+    rect(s, 6.95, 1.6, 5.75, 2.15, "1A1A1A")
+    tb(s, 0.9, 1.78, 5.2, 0.3, [{"text": "原先", "font": SANS, "size": 14, "color": SUB}])
+    tb(s, 0.88, 2.15, 5.2, 0.9, [{"text": "770,000", "font": SANS_M, "size": 40, "color": INK}])
+    tb(s, 0.9, 3.15, 5.2, 0.35, [{"text": "韩元", "font": SANS, "size": 14, "color": SUB}])
+    tb(s, 7.22, 1.78, 5.2, 0.3, [{"text": "现在", "font": SANS, "size": 14, "color": "E08A8A"}])
+    tb(s, 7.2, 2.1, 5.2, 1.0, [{"text": "76,500", "font": SANS_M, "size": 44, "color": WHITE}])
+    tb(s, 7.22, 3.15, 5.2, 0.35, [{"text": "韩元", "font": SANS, "size": 14, "color": "E08A8A"}])
     tb(
         s,
-        MX,
-        3.15,
-        11.5,
+        ML,
+        3.95,
+        12,
         0.4,
-        [{"text": "价格停在十年前。品质走到十年后。依据是一个月十万盒。", "font": SANS, "size": 16, "color": INK2}],
+        [{"text": "价格停在十年前。品质走到十年后。依据是一个月十万盒。", "font": SANS, "size": 16, "color": INK}],
     )
     facts = [
         ("0.5  →  18 吨", "三十六倍。操作的人仍是一个。"),
         ("干燥与切断", "省掉。鲜品洗净，直接取汁。"),
         ("合同栽培", "药材没有弹性。锁在涨价之前。"),
     ]
-    y = 3.85
+    x = ML
     for head, body in facts:
-        rule(s, MX, y, 11.75, FAINT, 1.0)
-        tb(s, MX, y + 0.16, 4.3, 0.45, [{"text": head, "font": SERIF_M, "size": 18, "color": INK}])
-        tb(s, 5.3, y + 0.18, 7.1, 0.45, [{"text": body, "font": SANS, "size": 16, "color": INK2}])
-        y += 0.78
-    footer(s, 8, total)
-    notes(s, "罐子从零点五吨到十八吨。药房要烘干、切断；大罐用鲜品，这两道就没有了。十月起按七万六千五百韩元卖。")
+        rect(s, x, 4.6, 3.9, 1.85, SOFT)
+        tb(s, x + 0.28, 4.8, 3.4, 0.7, [{"text": head, "font": SANS_M, "size": 18, "color": INK}])
+        tb(s, x + 0.28, 5.5, 3.4, 0.7, [{"text": body, "font": SANS, "size": 14, "color": SUB, "line": 1.35}])
+        x += 4.15
+    page(s, 8, total)
+    notes(s, "罐子从零点五吨做到十八吨。药房要烘干、切断；大罐用鲜品，这两道就没有了。")
 
-    # 09 integrated process
+    # 09 process
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "一贯工程")
-    title(s, "重做的是整条线")
+    bg(s, WHITE)
+    header(s, "一贯工程", "重做的是整条线")
     cols = [
         ("01", "走到原料", "调配不是源头。温度、压力、配比，向原料厂要。产线怎么转，图纸在设备厂手里。"),
         ("02", "先锁住，再放量", "工业品可以连夜加产。药材要一两年。市场做大之前，工序先放到不能再省。"),
         ("03", "会做，才交出运转", "设备我们出，原料我们买，对方只运转。一起，可以把小公司做到一百亿。不一起，自己做。"),
     ]
-    x = MX
-    for i, (num, head, body) in enumerate(cols):
-        if i:
-            vrule(s, x - 0.28, 2.05, 3.7, FAINT, 1.0)
-        tb(s, x, 2.05, 3.4, 0.35, [{"text": num, "font": SERIF, "size": 14, "color": LACQUER}])
-        tb(s, x, 2.5, 3.45, 0.9, [{"text": head, "font": SERIF_M, "size": 22, "color": INK}])
-        tb(s, x, 3.55, 3.4, 2.2, [{"text": body, "font": SANS, "size": 15, "color": INK2, "line": 1.45}])
-        x += 3.95
-    footer(s, 9, total)
-    notes(s, "绝对价格的定义：谁来做，都做不到比这更便宜。一百兆不是“等对方肯配合”。跟，就一起；不跟，优化也不停。")
+    x = ML
+    for num, head, body in cols:
+        tb(s, x, 1.7, 3.7, 0.4, [{"text": num, "font": SANS_M, "size": 16, "color": RED}])
+        tb(s, x, 2.2, 3.75, 1.0, [{"text": head, "font": SANS_M, "size": 24, "color": INK}])
+        tb(s, x, 3.4, 3.7, 2.2, [{"text": body, "font": SANS, "size": 16, "color": SUB, "line": 1.5}])
+        x += 4.15
+    rect(s, ML, 5.85, 12.08, 0.015, LINE)
+    tb(s, ML, 6.1, 12, 0.5, [{"text": "绝对价格，是谁来做都无法更便宜。跟，就一起。不跟，自己做。", "font": SANS_M, "size": 16, "color": INK}])
+    page(s, 9, total)
+    notes(s, "一百兆不是等对方肯配合。优化不停。")
 
     # 10 daiso
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "对手")
-    title(s, "生产侧，对方已经走到了")
-    tb(s, MX, 2.0, 5.2, 0.32, [{"text": "大创的销售", "font": SANS, "size": 14, "color": MUTED, "tracking": 1.2}])
-    tb(s, MX, 2.4, 5.5, 1.15, [{"text": "4.5 兆", "font": SERIF, "size": 60, "color": INK}])
-    tb(s, MX, 3.7, 5.2, 0.7, [{"text": "增长维持在三成以上。\n策展、放量、进产线，它都做。", "font": SANS, "size": 15, "color": INK2, "line": 1.4}])
-    vrule(s, 6.55, 2.1, 2.7, FAINT, 1.0)
-    tb(s, 7.05, 2.0, 5.2, 0.32, [{"text": "艾多美眼下的增长", "font": SANS, "size": 14, "color": LACQUER, "tracking": 1.2}])
-    tb(s, 7.05, 2.4, 5.4, 1.15, [{"text": "约 3%", "font": SERIF, "size": 60, "color": LACQUER}])
-    tb(s, 7.05, 3.7, 5.2, 0.7, [{"text": "品质更好、设计更好，\n解释不了这一仗。", "font": SANS, "size": 15, "color": INK2, "line": 1.4}])
-    rule(s, MX, 5.05, 11.75, FAINT, 1.0)
+    bg(s, WHITE)
+    header(s, "对手", "生产侧，对方已经走到了")
+    rect(s, ML, 1.7, 5.9, 3.35, SOFT)
+    rect(s, 6.8, 1.7, 5.9, 3.35, SOFT)
+    tb(s, 0.95, 1.95, 5.2, 0.32, [{"text": "大创的销售", "font": SANS, "size": 15, "color": SUB}])
+    tb(s, 0.92, 2.4, 5.3, 1.05, [{"text": "4.5 兆", "font": SANS_M, "size": 56, "color": INK}])
+    tb(s, 0.95, 3.65, 5.2, 0.9, [{"text": "增长维持在三成以上。\n策展、放量、进产线，它都做。", "font": SANS, "size": 16, "color": SUB, "line": 1.4}])
+    tb(s, 7.12, 1.95, 5.2, 0.32, [{"text": "艾多美眼下的增长", "font": SANS, "size": 15, "color": RED}])
+    tb(s, 7.08, 2.4, 5.3, 1.05, [{"text": "约 3%", "font": SANS_M, "size": 56, "color": RED}])
+    tb(s, 7.12, 3.65, 5.2, 0.9, [{"text": "品质更好、设计更好，\n解释不了这一仗。", "font": SANS, "size": 16, "color": SUB, "line": 1.4}])
     tb(
         s,
-        MX,
-        5.3,
-        11.6,
-        1.1,
-        [
-            {
-                "text": "便宜不等于粗糙。中国制造大约三成，其余来自韩国和其他地方。\n生产上能挖的，对方大多已经挖到了。差别要到销售这一侧去找。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-                "line": 1.45,
-            }
-        ],
+        ML,
+        5.35,
+        12.1,
+        1.2,
+        [{"text": "便宜不等于粗糙。生产上能挖的，对方大多已经挖到了。\n差别要到销售这一侧去找。", "font": SANS, "size": 18, "color": INK, "line": 1.45}],
     )
-    footer(s, 10, total)
-    notes(s, "大创比卖场更要认真看。经营者从制造里出来，下一代已经进入化妆品。说品牌更高，是不够的。")
+    page(s, 10, total)
+    notes(s, "大创比一般卖场更要认真看。说品牌更高，是不够的。")
 
     # 11 organization
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "组织")
-    title(s, "店不存在，队伍先走")
-    tb(s, MX, 1.9, 5.4, 0.4, [{"text": "大创", "font": SERIF_M, "size": 22, "color": INK}])
-    tb(
-        s,
-        MX,
-        2.5,
-        5.3,
-        1.5,
-        [
-            {
-                "text": "必须先有店，人再来。\n没有店，连找上门的路都没有。\n店的成本，和到店的成本，都是实的。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-                "line": 1.45,
-            }
-        ],
-    )
-    tb(s, 7.15, 1.9, 5.4, 0.4, [{"text": "艾多美", "font": SERIF_M, "size": 22, "color": LACQUER}])
-    tb(
-        s,
-        7.15,
-        2.5,
-        5.3,
-        1.6,
-        [
-            {
-                "text": "没有店。人自己用，也介绍。\n半价的体验代替广告。\n省下来的，就是那三十五个点。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-                "line": 1.45,
-            }
-        ],
-    )
-    # flywheel
-    rule(s, MX, 4.45, 11.75, FAINT, 1.0)
+    bg(s, WHITE)
+    header(s, "组织", "店不存在，队伍先走")
+    rect(s, ML, 1.6, 5.9, 2.55, SOFT)
+    rect(s, 6.8, 1.6, 5.9, 2.55, "1A1A1A")
+    tb(s, 0.92, 1.8, 5.2, 0.4, [{"text": "大创", "font": SANS_M, "size": 22, "color": INK}])
+    tb(s, 0.92, 2.35, 5.25, 1.5, [{"text": "必须先有店，人再来。\n店的成本，和到店的成本，都是实的。", "font": SANS, "size": 16, "color": SUB, "line": 1.45}])
+    tb(s, 7.1, 1.8, 5.2, 0.4, [{"text": "艾多美", "font": SANS_M, "size": 22, "color": WHITE}])
+    tb(s, 7.1, 2.35, 5.25, 1.5, [{"text": "没有店。人自己用，也介绍。\n半价的体验代替广告。省下的，就是那 35%。", "font": SANS, "size": 16, "color": "E6E6E6", "line": 1.45}])
     steps = ["绝对价格", "会员", "产量", "成本再降"]
-    x = MX
-    for i, step in enumerate(steps):
-        tb(s, x, 4.7, 2.15, 0.45, [{"text": step, "font": SERIF_M, "size": 16, "color": INK}])
-        if i < 3:
-            tb(s, x + 1.85, 4.68, 0.4, 0.4, [{"text": "—", "font": SERIF, "size": 16, "color": LACQUER, "align": "center"}])
-        x += 2.95
+    xs = [1.15, 4.25, 7.35, 10.45]
+    rect(s, xs[0] + 0.22, 4.72, xs[-1] - xs[0], 0.035, RED)
+    for i, (name, x) in enumerate(zip(steps, xs)):
+        oval(s, x, 4.52, 0.42, RED if i == 0 else DARK)
+        tb(s, x - 0.55, 5.1, 1.55, 0.4, [{"text": name, "font": SANS_M, "size": 14, "color": INK, "align": "center"}])
     tb(
         s,
-        MX,
-        5.4,
-        11.6,
-        1.15,
-        [
-            {
-                "text": "摩洛哥，会员十万以上。孟加拉，约二十万。收入差这么远，卖的是同一套产品。\n轮子没有刹车。邻里若觉得街角有差不多的东西、价格只有一半的一半，话就传不出去。",
-                "font": SANS,
-                "size": 15,
-                "color": INK2,
-                "line": 1.45,
-            }
-        ],
+        ML,
+        5.7,
+        12.1,
+        1.05,
+        [{"text": "摩洛哥，会员十万以上。孟加拉，约二十万。收入差这么远，卖的是同一套产品。\n轮子没有刹车。邻里若觉得街上有差不多的东西、价格低很多，话就传不出去。", "font": SANS, "size": 15, "color": SUB, "line": 1.45}],
     )
-    footer(s, 11, total)
-    notes(s, "组织先于店铺移动。非洲、孟加拉、秘鲁、巴拿马，都是队伍先走。绝对价格招来会员，会员堆出产量，产量把成本再压低。")
+    page(s, 11, total)
+    notes(s, "组织先于店铺移动。绝对价格招来会员，会员堆出产量，产量把成本再压低。")
 
     # 12 curation
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "策展")
-    title(s, "不停在货架上")
+    bg(s, WHITE)
+    header(s, "策展", "不停在货架上")
     qs = [
-        ("留下什么", "一个品类，一个。品质不拿来换价格。顾客不必在几百个相近的东西之间比较。"),
-        ("如何守住", "从原物到流通。工厂不必座座自有。原料、设备基准和数据，要在自己手里。循环的第一步，是对方看得见的愿景。"),
-        ("对准谁", "同一种产品，不再对所有人说同一句话。身体不同，建议就不同。"),
+        ("01", "留下什么", "一个品类，一个。品质不拿来换价格。顾客不必在几百个相近的东西之间比较。"),
+        ("02", "如何守住", "从原物到流通。工厂不必座座自有。原料、设备基准和数据，要在自己手里。"),
+        ("03", "对准谁", "同一种产品，不再对所有人说同一句话。身体不同，建议就不同。"),
     ]
-    y = 1.9
-    for head, body in qs:
-        tb(s, MX, y, 3.3, 0.85, [{"text": head, "font": SERIF_M, "size": 22, "color": INK}])
-        tb(s, 4.3, y, 8.2, 0.95, [{"text": body, "font": SANS, "size": 16, "color": INK2, "line": 1.35}])
+    y = 1.6
+    for num, head, body in qs:
+        tb(s, ML, y, 0.7, 0.45, [{"text": num, "font": SANS_M, "size": 18, "color": RED}])
+        tb(s, 1.5, y, 3.3, 0.5, [{"text": head, "font": SANS_M, "size": 24, "color": INK}])
+        tb(s, 5.1, y + 0.05, 7.5, 0.7, [{"text": body, "font": SANS, "size": 16, "color": SUB, "line": 1.35}])
         y += 1.25
-        if y < 5.5:
-            rule(s, MX, y - 0.22, 11.75, FAINT, 1.0)
+        if y < 5.2:
+            rect(s, ML, y - 0.22, 12.08, 0.015, LINE)
+    rect(s, ML, 5.45, 12.08, 1.15, SOFT)
     tb(
         s,
-        MX,
-        5.85,
-        11.6,
+        0.9,
+        5.7,
+        11.5,
         0.7,
-        [
-            {
-                "text": "五百个，不能按五百个算。亚马逊一把牙刷就有几百款。我们一把，顶被挑剩的那一个。",
-                "font": SANS_M,
-                "size": 15,
-                "color": INK,
-            }
-        ],
+        [{"text": "五百个，不能按五百个算。一把牙刷，顶别人那几百款里被挑剩的一个。", "font": SANS_M, "size": 18, "color": INK}],
     )
-    footer(s, 12, total)
-    notes(s, "信息和商品溢出来的时候，人要的不是更多，是谁按什么标准替他选。大量生产人人懂，进不去，是因为两边都在躲风险。愿景要先被看见。")
+    page(s, 12, total)
+    notes(s, "大量生产人人懂。进不去，是因为两边都在躲风险。愿景要先被看见，循环才开始。")
 
     # 13 3A
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "三 A")
-    title(s, "三台引擎，一个结构")
+    bg(s, WHITE)
+    header(s, "三 A", "三台引擎，一个结构")
     engines = [
-        ("APP", "个人平台", "自己的店，自己的健康，自己的教育，收成一处。一小时，变成五分钟。平台本身就是人工智能。"),
-        ("A-Care", "艾护理", "从“好东西请用”，进到血、饮食，和以后的十年。越用越准。人因此留下来。"),
-        ("AZA", "阿扎", "鸡蛋、油、加油，接进同一处。十万个品目负责人每天走进来。一百兆，由大约五百个主力品目赚。"),
+        ("APP", "个人平台", "自己的店，自己的健康，自己的教育，收成一处。一小时，变成五分钟。"),
+        ("A-Care", "艾护理", "从“请用”，进到血、饮食，和以后的十年。越用越准，人就留下来。"),
+        ("AZA", "阿扎", "鸡蛋、油、加油，接进同一处。十万个品目负责人每天来。一百兆，靠大约五百个主力品目。"),
     ]
-    x = MX
-    for i, (en, cn, body) in enumerate(engines):
-        if i:
-            vrule(s, x - 0.28, 1.95, 3.55, FAINT, 1.0)
-        tb(s, x, 1.95, 3.45, 0.4, [{"text": en, "font": SERIF, "size": 14, "color": LACQUER, "tracking": 1.2}])
-        tb(s, x, 2.4, 3.45, 0.55, [{"text": cn, "font": SERIF_M, "size": 26, "color": INK}])
-        tb(s, x, 3.2, 3.4, 2.2, [{"text": body, "font": SANS, "size": 15, "color": INK2, "line": 1.45}])
-        x += 3.95
-    rule(s, MX, 5.7, 11.75, FAINT, 1.0)
+    x = ML
+    for en, cn, body in engines:
+        rect(s, x, 1.65, 3.9, 3.7, SOFT)
+        rect(s, x, 1.65, 3.9, 0.08, RED)
+        tb(s, x + 0.3, 1.95, 3.3, 0.35, [{"text": en, "font": SANS_M, "size": 14, "color": RED}])
+        tb(s, x + 0.3, 2.4, 3.3, 0.55, [{"text": cn, "font": SANS_M, "size": 26, "color": INK}])
+        tb(s, x + 0.3, 3.2, 3.3, 1.8, [{"text": body, "font": SANS, "size": 15, "color": SUB, "line": 1.45}])
+        x += 4.15
     tb(
         s,
-        MX,
-        5.9,
-        11.6,
-        0.7,
-        [
-            {
-                "text": "事业者从推销变成顾问，变成这家平台的主人。消费、推荐和组织，变成留得下的资产。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-            }
-        ],
+        ML,
+        5.6,
+        12.1,
+        0.9,
+        [{"text": "事业者从推销变成顾问，变成这家平台的主人。\n消费、推荐和组织，变成留得下的资产。", "font": SANS, "size": 16, "color": INK, "line": 1.45}],
     )
-    footer(s, 13, total)
-    notes(s, "三A不是三款应用。艾护理负责关系，阿扎负责每天来，个人平台负责把事业做成方法。加油走联名卡的积分，不把加油券当商品卖。")
+    page(s, 13, total)
+    notes(s, "三 A 不是三款应用。艾护理负责关系，阿扎负责每天来，个人平台负责把事业做成方法。")
 
     # 14 four
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "结论")
-    title(s, "四件事同时为真")
-    lines = [
-        ("01", "这条链不容易被照抄", "抄一张价格表容易。抄育苗、栽培、图纸、专用线和数据，要同时有愿景和敢先投入的人。"),
+    bg(s, WHITE)
+    header(s, "结论", "四件事同时为真")
+    cells = [
+        ("01", "这条链不容易被照抄", "抄一张价格表容易。抄育苗、栽培、图纸和数据，要有愿景，也要有敢先投入的人。"),
         ("02", "不附带对方肯配合", "跟，就一起把小公司做大。不跟，优化也不停。"),
         ("03", "一半，就是千兆的底", "不要全部市场。绝对品质、绝对价格这一层的一半，已经够。"),
         ("04", "人留下，产量才留下", "健康越用越准，日常开支接在一处，内容和组织长在自己的平台上。"),
     ]
-    y = 1.85
-    for num, head, body in lines:
-        tb(s, MX, y, 0.7, 0.4, [{"text": num, "font": SERIF, "size": 16, "color": LACQUER}])
-        tb(s, 1.65, y - 0.02, 4.5, 0.4, [{"text": head, "font": SERIF_M, "size": 18, "color": INK}])
-        tb(s, 6.3, y, 6.2, 0.7, [{"text": body, "font": SANS, "size": 14, "color": INK2, "line": 1.25}])
-        y += 1.15
-    footer(s, 14, total)
-    notes(s, "一百兆是这四句同时转起来的结果。可以分开背，不能分开成立。")
+    positions = [(ML, 1.6), (6.85, 1.6), (ML, 4.15), (6.85, 4.15)]
+    for (num, head, body), (x, y) in zip(cells, positions):
+        rect(s, x, y, 5.85, 2.3, SOFT)
+        tb(s, x + 0.32, y + 0.25, 1.0, 0.4, [{"text": num, "font": SANS_M, "size": 16, "color": RED}])
+        tb(s, x + 0.32, y + 0.7, 5.2, 0.5, [{"text": head, "font": SANS_M, "size": 20, "color": INK}])
+        tb(s, x + 0.32, y + 1.28, 5.2, 0.8, [{"text": body, "font": SANS, "size": 14, "color": SUB, "line": 1.35}])
+    page(s, 14, total)
+    notes(s, "一百兆是这四句同时转起来的结果。可以分开讲，不能分开成立。")
 
-    # 15 two places
+    # 15 close
     s = new(prs)
-    bg(s, PAPER)
-    kicker(s, "落地")
-    title(s, "同一套算法")
-    tb(s, MX, 2.05, 5.4, 0.45, [{"text": "台湾", "font": SERIF_M, "size": 32, "color": INK}])
-    tb(
-        s,
-        MX,
-        2.75,
-        5.35,
-        2.6,
-        [
-            {
-                "text": "这个岛靠把成本和品质管到根上过活。\n在工厂里拆过成本的人，读成分，算价格，相信用过的人。\n绝对品质、绝对价格，在这里传得快。\n站住了，华文圈就有了标准。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-                "line": 1.5,
-            }
-        ],
-    )
-    vrule(s, 6.6, 2.1, 3.5, FAINT, 1.0)
-    tb(s, 7.1, 2.05, 5.4, 0.45, [{"text": "澳洲", "font": SERIF_M, "size": 32, "color": INK}])
-    tb(
-        s,
-        7.1,
-        2.75,
-        5.3,
-        2.6,
-        [
-            {
-                "text": "麦卢卡的价格写在熟成里，\n不写在分装上。\n只谈成品价，结构不动。\n先和蜂农锁量，再谈这一瓶多少钱。",
-                "font": SANS,
-                "size": 16,
-                "color": INK2,
-                "line": 1.5,
-            }
-        ],
-    )
-    footer(s, 15, total)
-    notes(s, "两地一南一北。台湾说明认得成本的市场为什么吃这套逻辑。澳洲说明一贯工程怎样落在一个具体的产地。")
-
-    # 16 close
-    s = new(prs)
-    bg(s, INK)
-    tb(
-        s,
-        MX,
-        0.58,
-        8,
-        0.3,
-        [{"text": "所以", "font": SANS_M, "size": 13, "color": "E4C7B4", "tracking": 3}],
-    )
-    rule(s, MX, 1.05, 0.46, LACQUER, 1.5)
+    bg(s, DARK)
+    rect(s, 0, 0, 0.14, H, RED)
     lines = ["生产被重做", "消费者被组织", "选择被拿掉", "三十五个点有了出处"]
-    y = 1.4
+    y = 0.85
     for line in lines:
-        tb(s, MX, y, 11, 0.55, [{"text": line, "font": SERIF, "size": 28, "color": CREAM}])
+        tb(s, 0.85, y, 11, 0.58, [{"text": line, "font": SANS_M, "size": 28, "color": WHITE}])
         y += 0.72
-    tb(s, MX, 4.55, 11, 1.0, [{"text": "不能不去", "font": SERIF, "size": 54, "color": "E4C7B4"}])
-    tb(
-        s,
-        MX,
-        6.35,
-        10,
-        0.35,
-        [{"text": "蒙想讯息    ·    二〇二六年九月二十二日", "font": SANS, "size": 13, "color": "A3988C", "tracking": 1.2}],
-    )
-    footer(s, 16, total, dark=True)
-    notes(s, "收束不再加新论点。四句读完，停在“不能不去”。问的时候，回到水源、组织、三A，这三处。")
+    tb(s, 0.85, 4.15, 11, 1.0, [{"text": "不能不去", "font": SANS_M, "size": 52, "color": RED}])
+    tb(s, 0.85, 6.35, 8, 0.35, [{"text": "蒙想讯息  ·  2026年9月22日", "font": SANS, "size": 14, "color": ON_DARK_DIM}])
+    page(s, 15, total, dark=True)
+    notes(s, "不再加新论点。四句读完，停在不能不去。")
 
     return prs
 
 
 if __name__ == "__main__":
-    prs = build()
     out = "/workspace/艾多美何以成为100兆韩元企业.pptx"
-    prs.save(out)
+    build().save(out)
     print(out)
