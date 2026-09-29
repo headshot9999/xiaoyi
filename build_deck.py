@@ -121,7 +121,7 @@ def build():
     prs.slide_height = Emu(6858000)
     prs.core_properties.title = "艾多美何以成为100兆韩元企业"
     prs.core_properties.subject = "蒙想讯息 · 2026年9月22日"
-    total_note = "全稿 17 页"
+    total_note = "全稿 19 页"
 
     # 01 封面
     s = new(prs)
@@ -476,7 +476,57 @@ def build():
     folio(s, 16)
     notes(s, "合作方先要看见能排产的量、设备由谁出、原料从育苗锁到哪一年。询价单给不出这些。")
 
-    # 17 收束
+    # 17 选择
+    s = new(prs)
+    bg(s, WHITE)
+    claim(s, "15", "选得快，靠的不是搜索")
+    picks = [
+        ("01", "平台已经会", "推荐几百款里的一个。\n款还在，人还在挑。\n搜索再快，选择的成本还在。"),
+        ("02", "先知道为什么", "品类里只剩一个。\n要回答的是这个人，\n为什么是这一个。\n餐食拍一张，步数接进来，\n话就跟着变。"),
+        ("03", "不必先搜", "打开就是今天的两样：\n一件主力，一件每天用的。\n介绍别人，先进入艾护理，\n不是先发一个产品链接。"),
+    ]
+    x = ML
+    for i, (num, head, body) in enumerate(picks):
+        if i:
+            rect(s, x - 0.22, 1.35, 0.012, 3.25, HAIR)
+        tb(s, x, 1.35, 3.5, 0.28, [{"text": num, "font": MED, "size": 14, "color": RED}])
+        tb(s, x, 1.72, 3.55, 0.55, [{"text": head, "font": MED, "size": 24, "color": INK}])
+        tb(s, x, 2.4, 3.55, 2.15, [{"text": body, "font": SANS, "size": 15, "color": BODY, "line": 1.4}])
+        x += 4.05
+    rect(s, ML, 5.15, 11.9, 0.012, HAIR)
+    tb(
+        s, ML, 5.42, 11.8, 1.2,
+        [{"text": "中国法人若用它去铺更多款，\n就是在做平台已经会做的事。", "font": MED, "size": 22, "color": RED, "line": 1.35}],
+    )
+    folio(s, 17)
+    notes(s, "开放平台的人工智能负责在长尾里排序。艾多美的人工智能负责对一个人说出为什么是这一个。目录不因此变长。")
+
+    # 18 接到工序
+    s = new(prs)
+    bg(s, WHITE)
+    claim(s, "16", "选得快，只是其中一件")
+    more = [
+        ("01", "收成能排产的数", "谁在用，下个月抽多少，\n喂回那只罐子和栽培合同。\n一个月十万套，\n要变成对方看得见的数。"),
+        ("02", "看守删掉的工序", "原料物性、配方、设备基准\n在自己手里。\n干燥、切断、换料清洗若回来，\n数据上要先看见。"),
+        ("03", "一小时收成五分钟", "明年年底，先有\n一百到二百支骨架。\n中国法人做中文的。\n事业者换成自己的脸。"),
+    ]
+    x = ML
+    for i, (num, head, body) in enumerate(more):
+        if i:
+            rect(s, x - 0.22, 1.35, 0.012, 3.25, HAIR)
+        tb(s, x, 1.35, 3.5, 0.28, [{"text": num, "font": MED, "size": 14, "color": RED}])
+        tb(s, x, 1.72, 3.55, 0.7, [{"text": head, "font": MED, "size": 22, "color": INK}])
+        tb(s, x, 2.55, 3.55, 2.0, [{"text": body, "font": SANS, "size": 15, "color": BODY, "line": 1.4}])
+        x += 4.05
+    rect(s, ML, 5.15, 11.9, 0.012, HAIR)
+    tb(
+        s, ML, 5.42, 11.8, 1.2,
+        [{"text": "数、工序、教育，要一起变。\n酒店和培训部，是旧成本。", "font": MED, "size": 22, "color": RED, "line": 1.35}],
+    )
+    folio(s, 18)
+    notes(s, "选择变快之外，中国的使用要收成合作方能排产的数；被删掉的工序若回来，数据上先看见；教育从一小时收成五分钟。")
+
+    # 19 收束
     s = new(prs)
     bg(s, DARK)
     rect(s, 0, 0, 0.08, H, RED)
@@ -494,7 +544,7 @@ def build():
     tb(s, 0.82, 4.05, 11, 0.85, [{"text": "不能不去", "font": MED, "size": 48, "color": RED}])
     tb(s, 0.88, 5.15, 11, 0.7, [{"text": "中国法人要做的，是把只为旧卖法存在的工序拿掉。", "font": SANS, "size": 18, "color": "D4D4D4"}])
     tb(s, 0.88, 6.35, 9, 0.3, [{"text": "蒙想讯息    2026年9月22日", "font": SANS, "size": 14, "color": DIM}])
-    folio(s, 17, dark=True)
+    folio(s, 19, dark=True)
     notes(s, "收束不再加新论点。四句对上封面。最后一句落到中国法人自己身上，然后停住。")
 
     return prs
