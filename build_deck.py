@@ -121,7 +121,7 @@ def build():
     prs.slide_height = Emu(6858000)
     prs.core_properties.title = "艾多美何以成为100兆韩元企业"
     prs.core_properties.subject = "蒙想讯息 · 2026年9月22日"
-    total_note = "全稿 14 页"
+    total_note = "全稿 17 页"
 
     # 01 封面
     s = new(prs)
@@ -135,10 +135,10 @@ def build():
             {"text": "一百兆韩元企业", "font": MED, "size": 48, "color": WHITE},
         ],
     )
-    rect(s, 0.88, 4.7, 1.05, 0.035, RED)
+    rect(s, 0.88, 4.55, 1.05, 0.035, RED)
     tb(
-        s, 0.88, 5.0, 10.5, 1.15,
-        [{"text": "一百兆不是喊出来的。\n工序造出价格，组织代替店铺，选择被拿掉。三件事锁在一起，它就往那里去。", "font": SANS, "size": 18, "color": "D4D4D4", "line": 1.45}],
+        s, 0.88, 4.85, 11.2, 1.45,
+        [{"text": "一百兆不是喊出来的。\n工序造出价格，组织代替店铺，选择被拿掉。\n中国法人要做的，是把这三件事在中国做成事实。", "font": SANS, "size": 18, "color": "D4D4D4", "line": 1.4}],
     )
     folio(s, 1, dark=True)
     notes(s, total_note + "。开场用这一句定标准：下面要证明的是结构，不是信念。")
@@ -408,7 +408,75 @@ def build():
     folio(s, 13)
     notes(s, "可以分开讲。不能分开成立。四句同时转，才是一百兆。")
 
-    # 14 收束
+    # 14 中国的三种诱惑
+    s = new(prs)
+    bg(s, WHITE)
+    claim(s, "12", "中国把三种诱惑同时放大")
+    traps = [
+        ("01", "自己挑", "天猫、京东把货铺开，让人在里面比较。选择一多，绝对品质就松。"),
+        ("02", "只要便宜", "低价平台把“最贱”做成默认。\n只认便宜的那一层，在中国更响。\n跟过去，就会另做一条贱的线。"),
+        ("03", "先把店开起来", "开市客、大创、名创优品，\n都用店把人接住。\n中国法人若先开店，三十五个点就没了。"),
+    ]
+    x = ML
+    for i, (num, head, body) in enumerate(traps):
+        if i:
+            rect(s, x - 0.22, 1.4, 0.012, 3.15, HAIR)
+        tb(s, x, 1.4, 3.5, 0.3, [{"text": num, "font": MED, "size": 14, "color": RED}])
+        tb(s, x, 1.85, 3.55, 0.85, [{"text": head, "font": MED, "size": 26, "color": INK}])
+        tb(s, x, 2.9, 3.55, 1.7, [{"text": body, "font": SANS, "size": 15, "color": BODY, "line": 1.45}])
+        x += 4.05
+    rect(s, ML, 5.15, 11.9, 0.012, HAIR)
+    tb(
+        s, ML, 5.45, 11.8, 1.2,
+        [{"text": "三种都在叫中国法人改模式。\n改了，就不再是同一套结构。", "font": MED, "size": 22, "color": RED, "line": 1.35}],
+    )
+    folio(s, 14)
+    notes(s, "中国市场把细分、低价和门店三句同时喊响。中国法人的第一件事，是这三句都不跟。")
+
+    # 15 中国法人四件
+    s = new(prs)
+    bg(s, WHITE)
+    claim(s, "13", "中国法人就做这四件")
+    duties = [
+        ("01", "不另做一条中国线", "一个品类仍是一个。不为最上的人做贵的，不为只认便宜的人做贱的。"),
+        ("02", "不在中国价格上加一层", "三十五个点不向中国消费者要。加了，就该让人去开市客。"),
+        ("03", "用中国的量，把工序锁住", "把看得见的需求交给一条线。愿景让对方看见，比先堆很多款有用。"),
+        ("04", "先有队伍，再谈店和广告", "店和投放吃掉的，就是那三十五个点。组织先动，店可以后有。"),
+    ]
+    y = 1.32
+    for num, head, body in duties:
+        tb(s, ML, y, 0.7, 0.4, [{"text": num, "font": MED, "size": 16, "color": RED}])
+        tb(s, 1.6, y - 0.02, 10.8, 0.42, [{"text": head, "font": MED, "size": 22, "color": INK}])
+        tb(s, 1.6, y + 0.46, 10.8, 0.4, [{"text": body, "font": SANS, "size": 15, "color": BODY}])
+        y += 1.28
+    folio(s, 15)
+    notes(s, "四件都是同一套结构在中国的动作。加款、加价、加店、加广告，都是把方向做松。")
+
+    # 16 三台引擎在中国
+    s = new(prs)
+    bg(s, WHITE)
+    claim(s, "14", "三台引擎，在中国转起来")
+    local = [
+        ("个人平台", "用中国会员听得懂的话，\n把一小时收成五分钟。\n事业者是这家平台的主人，\n不是发链接的人。"),
+        ("艾护理", "从身体和饮食进入，\n不再“好东西请用”。\n人越用越留下，建议才因人而异。\n不必等一座医院盖好才开始。"),
+        ("阿扎", "油、蛋、充电，每天的开支接进来。\n电要在规则里面找能累积的办法。\n十万个日常品目让人每天来。\n一百兆仍由大约五百个主力品目赚。"),
+    ]
+    x = ML
+    for i, (head, body) in enumerate(local):
+        if i:
+            rect(s, x - 0.22, 1.4, 0.012, 3.15, HAIR)
+        tb(s, x, 1.45, 3.55, 0.6, [{"text": head, "font": MED, "size": 24, "color": INK}])
+        tb(s, x, 2.3, 3.55, 2.2, [{"text": body, "font": SANS, "size": 15, "color": BODY, "line": 1.45}])
+        x += 4.05
+    rect(s, ML, 5.15, 11.9, 0.012, HAIR)
+    tb(
+        s, ML, 5.45, 11.8, 1.2,
+        [{"text": "中国法人不另造一个中国模式。\n同一套结构，在中国转起来。", "font": MED, "size": 22, "color": RED, "line": 1.35}],
+    )
+    folio(s, 16)
+    notes(s, "工具不换一套。换的是中国会员听得懂的话，和规则里面能做成的接法。医院不是开工的前提。")
+
+    # 17 收束
     s = new(prs)
     bg(s, DARK)
     rect(s, 0, 0, 0.08, H, RED)
@@ -423,10 +491,11 @@ def build():
         tb(s, 0.85, y, 5.0, 0.5, [{"text": a, "font": MED, "size": 26, "color": WHITE}])
         tb(s, 6.15, y + 0.08, 6.3, 0.4, [{"text": b, "font": SANS, "size": 16, "color": "B5B5B5"}])
         y += 0.78
-    tb(s, 0.82, 4.15, 11, 0.95, [{"text": "不能不去", "font": MED, "size": 52, "color": RED}])
+    tb(s, 0.82, 4.05, 11, 0.85, [{"text": "不能不去", "font": MED, "size": 48, "color": RED}])
+    tb(s, 0.88, 5.15, 11, 0.7, [{"text": "中国法人要做的，是把这四句在中国做成事实。", "font": SANS, "size": 18, "color": "D4D4D4"}])
     tb(s, 0.88, 6.35, 9, 0.3, [{"text": "蒙想讯息    2026年9月22日", "font": SANS, "size": 14, "color": DIM}])
-    folio(s, 14, dark=True)
-    notes(s, "收束不再加新论点。四句对上封面那句：工序、组织、选择。然后停住。")
+    folio(s, 17, dark=True)
+    notes(s, "收束不再加新论点。四句对上封面。最后一句落到中国法人自己身上，然后停住。")
 
     return prs
 
