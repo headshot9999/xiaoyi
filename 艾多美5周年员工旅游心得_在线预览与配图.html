@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>艾多美5周年员工旅游心得 PPT（上海·杭州）</title>
+  <style>
+    :root {
+      --atomy-blue: #0093d0;
+      --atomy-dark: #0c2340;
+      --atomy-light: #e6f4fa;
+      --gold: #c8923a;
+      --gold-soft: #fdf6eb;
+      --ink: #1a2433;
+      --body: #3d4b5c;
+      --muted: #7a8b9e;
+      --border: #dce5ef;
+      --bg-soft: #f5f8fb;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #0b1626;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 顶部控制栏 */
+    .toolbar {
+      background: #102038;
+      border-bottom: 1px solid #223b5e;
+      color: #fff;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-brand {
+      background: var(--atomy-blue);
+      color: #fff;
+      font-weight: 600;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+    }
+    .toolbar-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #e6f1fc;
+    }
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      background: var(--atomy-blue);
+      color: #fff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #3c608c;
+      color: #cfe4fa;
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: #fff;
+    }
+    .page-indicator {
+      font-size: 13px;
+      color: #9ab4ce;
+      min-width: 70px;
+      text-align: center;
+    }
+    /* 幻灯片舞台 */
+    .stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .slide {
+      width: 1280px;
+      height: 720px;
+      background: var(--bg-soft);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      display: none;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+    .slide.active { display: block; }
+    .top-bar {
+      height: 6px;
+      background: var(--atomy-blue);
+      width: 100%;
+    }
+    .slide-header {
+      padding: 22px 56px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .slide-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .tag-pill {
+      background: var(--atomy-light);
+      color: var(--atomy-blue);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+    .header-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-left: 12px;
+      flex: 1;
+    }
+    .folio {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .slide-h1 {
+      font-size: 27px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .slide-body {
+      padding: 22px 56px;
+      height: calc(720px - 115px);
+      display: grid;
+      gap: 20px;
+    }
+    /* 通用卡片与相框 */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-accent-top::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--atomy-blue);
+    }
+    .card-accent-gold::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--gold);
+    }
+    .photo-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+    }
+    .photo-inner {
+      flex: 1;
+      background: #ebf1f6;
+      border: 1px dashed #b5cade;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+    }
+    .photo-inner img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .photo-placeholder-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--atomy-dark);
+      margin-bottom: 6px;
+    }
+    .photo-placeholder-hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .photo-caption {
+      padding-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .photo-caption span.sub {
+      font-weight: 400;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    /* 封面专属样式 */
+    .slide-cover {
+      background: var(--atomy-dark);
+      color: #fff;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 32px;
+      padding: 48px 56px;
+      height: 100%;
+      position: relative;
+    }
+    .slide-cover::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 12px;
+      background: var(--atomy-blue);
+    }
+    .cover-pill {
+      display: inline-block;
+      background: #163558;
+      border: 1px solid #2b5482;
+      color: #7ccdf4;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 22px;
+    }
+    .cover-h1 {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .cover-h2 {
+      font-size: 24px;
+      color: #8ed6fa;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .cover-divider {
+      width: 110px;
+      height: 4px;
+      background: var(--gold);
+      margin-bottom: 22px;
+    }
+    .cover-desc {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #d6e5f5;
+      margin-bottom: 28px;
+    }
+    .cover-badges {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .cover-badge {
+      background: #152f4e;
+      border: 1px solid #294b72;
+      border-top: 3px solid var(--gold);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .cover-badge .k { font-size: 11px; color: #7ccdf4; font-weight: 600; }
+    .cover-badge .v { font-size: 14px; color: #fff; font-weight: 700; margin: 5px 0 3px; }
+    .cover-badge .s { font-size: 11px; color: #9ab4ce; }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none !important; }
+      .stage { padding: 0; display: block; }
+      .slide {
+        display: block !important;
+        page-break-after: always;
+        box-shadow: none;
+        border-radius: 0;
+        width: 100%;
+        height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="badge-brand">ATOMY 5周年福利</span>
+      <span class="toolbar-title">艾多美 5 周年员工旅游心得 PPT（上海 · 杭州）</span>
+    </div>
+    <div class="toolbar-actions">
+      <input type="file" id="folderInput" webkitdirectory directory multiple accept="image/*" style="display:none" />
+      <button class="btn btn-gold" onclick="document.getElementById('folderInput').click()">
+        📂 一键选择「5周年旅游照片」文件夹自动配图
+      </button>
+      <button class="btn btn-outline" onclick="prevSlide()">◀ 上一页</button>
+      <span class="page-indicator" id="pageIndicator">01 / 07</span>
+      <button class="btn btn-outline" onclick="nextSlide()">下一页 ▶</button>
+      <button class="btn" onclick="window.print()">🖨️ 打印 / 导出 PDF</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- 第 1 页：封面 -->
+    <section class="slide active">
+      <div class="slide-cover">
+        <div>
+          <div class="cover-pill">ATOMY 艾多美 · 3 / 5 / 7 / 10 周年员工旅游福利</div>
+          <div class="cover-h1">五载同心 · 携爱同行</div>
+          <div class="cover-h2">我的艾多美 5 周年上海 & 杭州家庭之旅</div>
+          <div class="cover-divider"></div>
+          <p class="cover-desc">
+            在艾多美，每满 <strong>3、5、7、10 年</strong>都能享受到由公司承担费用的员工旅游。<br/>
+            满 5 周年的这一程，我带着<strong>父母、老婆和孩子</strong>一起走进繁华上海与诗画杭州——把公司的温暖福利，化作一家三代人最珍贵的团圆记忆。
+          </p>
+          <div class="cover-badges">
+            <div class="cover-badge">
+              <div class="k">里程碑</div>
+              <div class="v">入职满 5 周年</div>
+              <div class="s">3/5/7/10年专属福利</div>
+            </div>
+            <div class="cover-badge">
+              <div class="k">同行家人</div>
+              <div class="v">父母 · 老婆 · 孩子</div>
+              <div class="s">三代同堂温馨出游</div>
+            </div>
+            <div class="cover-badge">
+              <div class="k">双城足迹</div>
+              <div class="v">上海 × 杭州</div>
+              <div class="s">外滩豫园 · 西湖雷峰塔</div>
+            </div>
+            <div class="cover-badge">
+              <div class="k">舌尖犒赏</div>
+              <div class="v">云端自助 & 海鲜</div>
+              <div class="s">金茂56层 · 龙虾面包蟹</div>
+            </div>
+          </div>
+        </div>
+        <div class="photo-box" style="background:#162f4d; border-color:#2c4c70;" data-keywords="全家,合照,合影,家人,父母,外滩,西湖,cover,01">
+          <div class="photo-inner" style="background:#1e3b5e; border-color:#3a628f;">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title" style="color:#fff;">【五周年全家福 · 幸福启程】</div>
+              <div class="photo-placeholder-hint" style="color:#9ab4ce;">
+                点击顶部「选择照片文件夹」或直接点击此框选择照片<br/>
+                （对应：/Users/jiangxiaoyi/sam's document/公司旅游心得/5周年旅游照片）
+              </div>
+            </div>
+          </div>
+          <div class="photo-caption" style="color:#fff;">
+            <span style="color:var(--gold)">●</span> 五周年全家福 · 幸福启程 <span class="sub" style="color:#9ab4ce">带着父母、老婆、孩子共赴沪杭之旅</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 2 页：福利机制与行程总览 -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">01 · 福利与行程</span>
+          <span class="header-sub">每满 3、5、7、10 年员工旅游制度 · 沪杭双城家庭行</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 02 / 07</span>
+        </div>
+        <div class="slide-h1">满 5 年的温暖馈赠：公司承担费用，让孝心与陪伴不留遗憾</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: 1.1fr 1.15fr 0.9fr;">
+        <div class="card card-accent-top" style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <h3 style="font-size:18px; margin-bottom:8px;">艾多美员工旅游福利机制</h3>
+            <p style="font-size:13px; color:var(--body); line-height:1.5; margin-bottom:14px;">
+              公司为每满 <strong>3、5、7、10 年</strong>的员工提供专项旅游福利，<strong>费用由公司承担</strong>，真正把“珍视灵魂”落到实处。
+            </p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--bg-soft); display:flex; justify-content:space-between;">
+                <strong style="color:var(--atomy-blue)">满 3 年</strong><span>初绽芳华 · 充电启程</span>
+              </div>
+              <div style="padding:10px 14px; border:2px solid var(--gold); border-radius:8px; background:var(--gold-soft); display:flex; justify-content:space-between;">
+                <strong style="color:var(--gold)">满 5 年 ★</strong><strong>五载笃行 · 携家沪杭游（本次行程）</strong>
+              </div>
+              <div style="padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--bg-soft); display:flex; justify-content:space-between;">
+                <strong style="color:var(--atomy-blue)">满 7 年</strong><span>七年深耕 · 远方再叙</span>
+              </div>
+              <div style="padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--bg-soft); display:flex; justify-content:space-between;">
+                <strong style="color:var(--atomy-blue)">满 10 年</strong><span>十载同心 · 荣耀盛旅</span>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--atomy-light); padding:10px 14px; border-radius:8px; font-size:12.5px; color:var(--atomy-dark); line-height:1.5;">
+            <strong>出游成员：</strong>我 + 父母 + 老婆 + 孩子（三代同游）<br/>
+            <strong>核心感受：</strong>借公司福利带全家看风景、吃大餐，温暖加倍！
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div class="card card-accent-top" style="flex:1">
+            <h3 style="font-size:16px; margin-bottom:10px;">第一站 · 魔都上海（都市繁华与老城烟火）</h3>
+            <ul style="font-size:13.5px; color:var(--body); line-height:1.8; padding-left:18px;">
+              <li><strong>外滩漫步：</strong>饱览万国建筑博览群与黄浦江对岸陆家嘴天际线</li>
+              <li><strong>金茂大厦 56 层：</strong>300 元/位高空观景自助餐，陪父母妻儿云端用餐</li>
+              <li><strong>豫园 & 城隍庙：</strong>亭台楼阁间感受江南园林与老上海民俗风味</li>
+              <li><strong>南京路步行街：</strong>十里洋场霓虹闪烁，全家欢声笑语逛街打卡</li>
+            </ul>
+          </div>
+          <div class="card card-accent-gold" style="flex:1">
+            <h3 style="font-size:16px; margin-bottom:10px;">第二站 · 诗画杭州（湖光山色与海鲜盛宴）</h3>
+            <ul style="font-size:13.5px; color:var(--body); line-height:1.8; padding-left:18px;">
+              <li><strong>西湖泛舟漫步：</strong>水光潋滟晴方好，带父母慢节奏赏湖景</li>
+              <li><strong>雷峰塔登高：</strong>俯瞰西湖全景与千年传奇，孩子收获满满</li>
+              <li><strong>丰盛海鲜大餐：</strong>大龙虾、膏满肉肥的面包蟹等鲜美海味齐上桌</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="出发,高铁,家庭,父母,老婆,孩子,全家,02">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【三代同堂 · 开心出发】</div>
+              <div class="photo-placeholder-hint">父母身体健康、妻儿笑颜如花</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 三代同堂 · 开心出发 <span class="sub">开启沪杭幸福旅程</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 3 页：上海站（一）外滩与金茂56层自助 -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">02 · 上海站 · 云端与江景</span>
+          <span class="header-sub">上海站亮点一：万国建筑群 × 金茂大厦 56F 高空美食体验</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 03 / 07</span>
+        </div>
+        <div class="slide-h1">漫步外滩江风，登顶金茂大厦 56 层享 300 元/位云端观景自助</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: 1.15fr 1fr 0.95fr;">
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div class="card card-accent-top" style="flex:1">
+            <h3 style="font-size:17px; margin-bottom:10px;">📍 外滩：浦江两岸的世纪同框</h3>
+            <p style="font-size:13.5px; color:var(--body); line-height:1.65; margin-bottom:8px;">
+              带着父母、老婆和孩子走在外滩江堤上，一边是厚重典雅的万国历史建筑群，隔江相望便是高耸入云的陆家嘴摩天大楼。
+            </p>
+            <p style="font-size:13.5px; color:var(--body); line-height:1.65;">
+              父母看着眼前的繁华景象感慨万千，孩子兴奋地指着东方明珠和金茂大厦拍照留念，江风吹拂下满是一家人的温馨。
+            </p>
+          </div>
+          <div class="card card-accent-gold" style="flex:1">
+            <h3 style="font-size:17px; margin-bottom:10px;">🍽️ 金茂大厦 56 层：300 元/位云端观景自助</h3>
+            <p style="font-size:13.5px; color:var(--body); line-height:1.65; margin-bottom:8px;">
+              特意带全家人登上了陆家嘴地标——<strong>金茂大厦 56 层</strong>，体验 <strong>300 元/位的高空观景自助餐</strong>。震撼的空中中庭挑高与窗外城市天际线让人眼前一亮。
+            </p>
+            <p style="font-size:13.5px; color:var(--body); line-height:1.65;">
+              因为有公司旅游福利的鼎力支持，可以毫不犹豫地请父母和妻儿享受高品质餐饮。看着长辈吃得舒心、孩子选得开心，内心格外自豪！
+            </p>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="外滩,东方明珠,上海,江,bund,03">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【上海外滩 · 浦江留影】</div>
+              <div class="photo-placeholder-hint">与父母、老婆、孩子在外滩江畔合影</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 上海外滩 · 浦江留影 <span class="sub">万国建筑与陆家嘴同框</span>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="金茂,56,自助,餐厅,jinmao,04">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【金茂大厦 56 层观景自助】</div>
+              <div class="photo-placeholder-hint">300元/位云端美食 · 俯瞰申城风光</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--gold)">●</span> 金茂大厦 56F 观景自助 <span class="sub">300元/位云端盛宴</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 4 页：上海站（二）豫园、城隍庙、南京路 -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">03 · 上海站 · 海派风情</span>
+          <span class="header-sub">上海站亮点二：江南古典园林 × 老城厢烟火气 × 中华商业第一街</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 04 / 07</span>
+        </div>
+        <div class="slide-h1">漫游豫园与城隍庙古韵，打卡十里洋场南京路步行街</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 1fr;">
+        <div class="card card-accent-top">
+          <h3 style="font-size:16px; margin-bottom:8px;">01 豫园 · 江南园林雅韵</h3>
+          <p style="font-size:13px; color:var(--body); line-height:1.55;">
+            九曲桥畔锦鲤戏水，亭台楼阁一步一景。陪着父母慢步在精巧的古典园林里，长辈们对传统江南建筑赞不绝口。
+          </p>
+        </div>
+        <div class="card card-accent-gold">
+          <h3 style="font-size:16px; margin-bottom:8px;">02 城隍庙 · 地道老上海烟火</h3>
+          <p style="font-size:13px; color:var(--body); line-height:1.55;">
+            飞檐翘角下热闹非凡，带家人品尝南翔小笼包与特色传统糕点，热气腾腾的烟火气让一家人胃口大开。
+          </p>
+        </div>
+        <div class="card card-accent-top">
+          <h3 style="font-size:16px; margin-bottom:8px;">03 南京路 · 十里洋场繁华夜</h3>
+          <p style="font-size:13px; color:var(--body); line-height:1.55;">
+            漫步百年南京路步行街，百年老字号与现代潮流交织，复古叮当车与璀璨霓虹让孩子兴奋不已。
+          </p>
+        </div>
+
+        <div class="photo-box" data-keywords="豫园,九曲桥,园林,yuyuan,05">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【豫园 · 亭台九曲桥】</div>
+              <div class="photo-placeholder-hint">古典园林里的全家慢时光</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 豫园 · 江南园林 <span class="sub">亭台楼阁步步生景</span>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="城隍庙,小吃,古街,庙,06">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【城隍庙 · 传统民俗与小吃】</div>
+              <div class="photo-placeholder-hint">飞檐古街 · 品尝地道海派风味</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--gold)">●</span> 城隍庙 · 老城烟火 <span class="sub">品地道海派小吃</span>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="南京路,步行街,街,nanjing,07">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【南京路步行街 · 繁华街景】</div>
+              <div class="photo-placeholder-hint">十里洋场打卡留念</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 南京路步行街 <span class="sub">十里洋场繁华打卡</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 5 页：杭州站 西湖与雷峰塔 -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">04 · 杭州站 · 诗画江南</span>
+          <span class="header-sub">杭州站亮点：西湖十景风韵 × 雷峰塔登高远眺</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 05 / 07</span>
+        </div>
+        <div class="slide-h1">漫步西湖碧波柳浪，登临雷峰塔俯瞰人间天堂</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="photo-box" data-keywords="西湖,杭州,湖,游船,xihu,08">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【杭州西湖 · 湖光山色】</div>
+              <div class="photo-placeholder-hint">水光潋滟 · 柳浪闻莺 · 全家漫步</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 杭州西湖 · 湖光山色 <span class="sub">碧波荡漾画中游</span>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="雷峰塔,塔,leifeng,09">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【雷峰塔 · 登高望远】</div>
+              <div class="photo-placeholder-hint">登塔俯瞰西湖全景与古今传奇</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--gold)">●</span> 雷峰塔 · 登高望远 <span class="sub">一览西湖全景</span>
+          </div>
+        </div>
+
+        <div class="card card-accent-top" style="display:flex; flex-direction:column; gap:14px;">
+          <h3 style="font-size:17px;">🌿 江南杭州 · 身心放松之旅</h3>
+          <div style="background:var(--bg-soft); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--atomy-blue); font-size:14px; margin-bottom:4px;">◆ 西湖畔的慢步调</div>
+            <p style="font-size:12.5px; color:var(--body); line-height:1.55;">
+              告别了魔都上海的快节奏，来到杭州西湖边，迎面是微风拂柳与碧波游船。陪着父母沿着湖畔漫步，节奏舒缓惬意，最适合长辈放松身心。
+            </p>
+          </div>
+          <div style="background:var(--bg-soft); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--atomy-blue); font-size:14px; margin-bottom:4px;">◆ 登雷峰塔揽全湖之胜</div>
+            <p style="font-size:12.5px; color:var(--body); line-height:1.55;">
+              全家一起登上雷峰塔（扶梯与电梯让父母毫无爬山压力）。站在塔顶极目远眺，整座西湖的山水画卷尽收眼底，孩子还兴致勃勃地听起了白娘子的传说。
+            </p>
+          </div>
+          <div style="background:var(--bg-soft); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="font-weight:700; color:var(--atomy-blue); font-size:14px; margin-bottom:4px;">◆ 三代同游的温情时刻</div>
+            <p style="font-size:12.5px; color:var(--body); line-height:1.55;">
+              看着父母在西湖边舒展的笑容、老婆和孩子并肩看风景的背影，深刻感受到：最美的风景不仅是西湖山水，更是身旁整整齐齐的家人。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 6 页：海鲜大餐（龙虾、面包蟹等） -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">05 · 舌尖盛宴 · 海鲜大餐</span>
+          <span class="header-sub">美食记录：金茂 56 层云端自助之外，更有一家人围坐共享的澎湃海鲜盛宴</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 06 / 07</span>
+        </div>
+        <div class="slide-h1">大龙虾、膏满面包蟹齐上桌：用丰盛海鲜大餐犒赏最爱的家人</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: 1.15fr 1fr 1fr;">
+        <div class="card card-accent-gold" style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <h3 style="font-size:18px; margin-bottom:10px;">🦞 鲜味满桌 · 团圆欢聚</h3>
+            <p style="font-size:13px; color:var(--body); line-height:1.6; margin-bottom:14px;">
+              除了上海金茂大厦 56 层 300 元/位的观景自助，这次旅途中最让全家人念念不忘的，还有丰盛过瘾的<strong>海鲜大餐</strong>！
+            </p>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="background:var(--gold-soft); border:1px solid #f0dec2; border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold); font-size:14px; margin-bottom:4px;">★ 招牌大龙虾</div>
+                <p style="font-size:12.5px; color:var(--body); line-height:1.5;">肉质紧实弹牙、鲜甜饱满，端上桌瞬间成为全场焦点，孩子和父母都赞不绝口。</p>
+              </div>
+              <div style="background:var(--gold-soft); border:1px solid #f0dec2; border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold); font-size:14px; margin-bottom:4px;">★ 爆膏面包蟹</div>
+                <p style="font-size:12.5px; color:var(--body); line-height:1.5;">蟹壳里满满的红膏与蟹黄，蟹肉厚实鲜美，一口下去全是满足感。</p>
+              </div>
+              <div style="background:var(--gold-soft); border:1px solid #f0dec2; border-radius:8px; padding:12px;">
+                <div style="font-weight:700; color:var(--gold); font-size:14px; margin-bottom:4px;">★ 多款时令海味</div>
+                <p style="font-size:12.5px; color:var(--body); line-height:1.5;">各类鲜虾贝类琳琅满目，一家人围坐举杯，欢声笑语间洗去旅途疲惫。</p>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--atomy-light); color:var(--atomy-blue); font-weight:700; font-size:12.5px; text-align:center; padding:10px; border-radius:8px;">
+            感谢公司报销旅游费用，让家人吃得尽兴、玩得舒心！
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="龙虾,虾,海鲜,lobster,seafood,10">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【招牌大龙虾 · 鲜美上桌】</div>
+              <div class="photo-placeholder-hint">个头饱满 · 肉质Q弹鲜甜</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--gold)">●</span> 招牌大龙虾 <span class="sub">鲜甜弹牙 · 全家最爱</span>
+          </div>
+        </div>
+
+        <div class="photo-box" data-keywords="蟹,面包蟹,大餐,美食,吃,crab,11">
+          <div class="photo-inner">
+            <img alt="" style="display:none" />
+            <div class="placeholder-text">
+              <div class="photo-placeholder-title">【爆膏面包蟹 & 海鲜盛宴】</div>
+              <div class="photo-placeholder-hint">膏满黄肥 · 全家围坐大快朵颐</div>
+            </div>
+          </div>
+          <div class="photo-caption">
+            <span style="color:var(--atomy-blue)">●</span> 爆膏面包蟹 & 海鲜大餐 <span class="sub">膏满肉厚超满足</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 7 页：旅游心得总结 -->
+    <section class="slide">
+      <div class="top-bar"></div>
+      <div class="slide-header">
+        <div class="slide-header-top">
+          <span class="tag-pill">06 · 旅游心得与感恩</span>
+          <span class="header-sub">五周年员工旅游总结 · 向着 7 周年、10 周年继续笃行</span>
+          <span class="folio">ATOMY 5周年员工旅游心得 · 07 / 07</span>
+        </div>
+        <div class="slide-h1">一份福利温暖一家人：感恩艾多美五载培养，满电再出发！</div>
+      </div>
+      <div class="slide-body" style="grid-template-columns: 1.45fr 1fr;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card" style="border-left: 6px solid var(--atomy-blue); flex:1;">
+            <h3 style="font-size:16.5px; margin-bottom:6px;">01 感恩公司：有温度的福利制度</h3>
+            <p style="font-size:13px; color:var(--body); line-height:1.6;">
+              艾多美每满 3、5、7、10 年的公费旅游福利，不仅是对员工多年付出的认可，更是对员工背后家庭的关怀。因为有公司的承担，这次五周年之旅才能毫无后顾之忧地给父母、老婆和孩子安排最好的体验。
+            </p>
+          </div>
+          <div class="card" style="border-left: 6px solid var(--gold); flex:1;">
+            <h3 style="font-size:16.5px; margin-bottom:6px;">02 珍视家人：最好的爱是高质量陪伴</h3>
+            <p style="font-size:13px; color:var(--body); line-height:1.6;">
+              平时忙于工作，很少有机会同时带父母、老婆和孩子出远门。从外滩江风、金茂 56 层 300 元/位自助、豫园城隍庙南京路，到西湖雷峰塔与龙虾面包蟹海鲜大餐，看到父母的笑容与孩子的成长，所有的忙碌都有了意义。
+            </p>
+          </div>
+          <div class="card" style="border-left: 6px solid var(--atomy-dark); flex:1;">
+            <h3 style="font-size:16.5px; margin-bottom:6px;">03 笃定前行：满电回归，奔赴 7 年与 10 年</h3>
+            <p style="font-size:13px; color:var(--body); line-height:1.6;">
+              身心在江南山水中得到了彻底的放松与充电，家人的支持与认可更化作我前进的动力。回到岗位后，我将以更饱满的热情投入工作，与艾多美一起成长，期待 7 周年、10 周年的下一次约定！
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="photo-box" style="flex:1;" data-keywords="合影,全家,笑,家庭,最后,end,12">
+            <div class="photo-inner">
+              <img alt="" style="display:none" />
+              <div class="placeholder-text">
+                <div class="photo-placeholder-title">【旅途美好定格 · 幸福全家福】</div>
+                <div class="photo-placeholder-hint">感恩艾多美 · 让工作与家庭生活同样精彩</div>
+              </div>
+            </div>
+            <div class="photo-caption">
+              <span style="color:var(--atomy-blue)">●</span> 旅途美好定格 <span class="sub">一家人的江南记忆</span>
+            </div>
+          </div>
+          <div style="background:var(--atomy-dark); color:#fff; border-top:4px solid var(--gold); border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:14.5px; font-weight:700; margin-bottom:4px;">“因为艾多美，我能带着最爱的人看更大的世界。”</div>
+            <div style="font-size:12.5px; color:#8ed6fa;">感谢公司 · 感谢领导与伙伴 · 下一站 7 周年见！</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 单张图片替换隐藏选择器 -->
+  <input type="file" id="singleImageInput" accept="image/*" style="display:none" />
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let current = 0;
+
+    function updateSlide() {
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+      document.getElementById('pageIndicator').textContent =
+        String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+    }
+    function prevSlide() {
+      current = (current - 1 + slides.length) % slides.length;
+      updateSlide();
+    }
+    function nextSlide() {
+      current = (current + 1) % slides.length;
+      updateSlide();
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+    });
+
+    // 支持点击任意照片框单独更换照片
+    let activePhotoBox = null;
+    const singleInput = document.getElementById('singleImageInput');
+    document.querySelectorAll('.photo-box').forEach((box) => {
+      box.title = '点击可手动选择/更换这张照片';
+      box.addEventListener('click', () => {
+        activePhotoBox = box;
+        singleInput.click();
+      });
+    });
+
+    singleInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file || !activePhotoBox) return;
+      setBoxImage(activePhotoBox, file);
+      singleInput.value = '';
+    });
+
+    function setBoxImage(box, file) {
+      const url = URL.createObjectURL(file);
+      const img = box.querySelector('img');
+      const placeholder = box.querySelector('.placeholder-text');
+      img.src = url;
+      img.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+    }
+
+    // 一键选择文件夹后按关键词或顺序自动分配照片
+    document.getElementById('folderInput').addEventListener('change', (e) => {
+      const files = Array.from(e.target.files).filter((f) =>
+        /\.(jpe?g|png|webp|bmp|gif)$/i.test(f.name) && !f.name.startsWith('.')
+      );
+      if (!files.length) return;
+      files.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+
+      const boxes = Array.from(document.querySelectorAll('.photo-box'));
+      const used = new Set();
+
+      boxes.forEach((box) => {
+        const kws = (box.dataset.keywords || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+        let picked = null;
+        for (const kw of kws) {
+          picked = files.find((f) => !used.has(f) && f.name.toLowerCase().includes(kw));
+          if (picked) break;
+        }
+        if (!picked) {
+          picked = files.find((f) => !used.has(f));
+        }
+        if (!picked) {
+          picked = files[used.size % files.length];
+        }
+        if (picked) {
+          used.add(picked);
+          setBoxImage(box, picked);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
